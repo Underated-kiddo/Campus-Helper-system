@@ -1,0 +1,84 @@
+# =========================
+# Project .gitignore
+# Node / JavaScript typical ignores for server + client
+# =========================
+
+# Node modules
+node_modules/
+**/node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.production
+.env.test
+
+# Build outputs
+dist/
+build/
+out/
+.tmp/
+.next/
+.coverage/
+coverage/
+
+# Test coverage
+.nyc_output/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln
+*.swp
+*.class
+
+# Dependency lockfiles from other package managers (keep pnpm lockfile if used)
+package-lock.json
+yarn.lock
+
+# pnpm store
+.pnpm-store/
+
+# Temporary files
+# VS Code workspace storage and local history
+.vscode/*history*
+
+# Client-specific
+client/node_modules/
+client/build/
+client/.env.local
+
+# Server-specific (case-sensitive folder name in this repo is "Server")
+Server/node_modules/
+Server/.env.local
+
+# Misc
+*.tmp
+*.temp
+tmp/
+temp/
+
+# macOS Finder attributes
+.AppleDouble
