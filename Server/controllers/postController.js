@@ -13,7 +13,7 @@ exports.getMyPosts = async (req ,res) => {
 };
 
 //GET /api/post/all
-exports.getAllPosts = async(res,req) =>{
+exports.getAllPosts = async(req ,res) =>{
     const tasks = await Post.find().populate("owner","email");
     res.json(tasks);
 };

@@ -1,11 +1,10 @@
 {
-  "name": "Server",
+  "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "Server.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "pnpm nodemon"
   },
   "keywords": [],
   "author": "",
