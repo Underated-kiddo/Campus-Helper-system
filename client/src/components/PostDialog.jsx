@@ -1,5 +1,5 @@
 import {
-    Dialog, DialogTrigger,DialogContent,DialogHeader,DialogTittle,
+    Dialog, DialogTrigger,DialogContent,DialogHeader,DialogTitle,
     DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea} from "@/components/ui/textarea";
@@ -24,7 +24,7 @@ export default function PostDialog ({ onSubmit}){
 
             <DialogContent>
                 <DialogHeader>
-                    <DialogTittle>New Post</DialogTittle>
+                    <DialogTitle>New Post</DialogTitle>
                 </DialogHeader>
 
                 <Input placeholder ="title" value={title} onChang={ e => setTitle(e.target.value) } />

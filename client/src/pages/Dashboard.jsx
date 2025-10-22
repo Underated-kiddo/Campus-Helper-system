@@ -3,7 +3,7 @@ import API from "../services/api";
 import PostCard from "@/components/PostCard";
 import PostDialog from "@/components/PostDialog";
 import Navbar from "@/components/Navbar";
-import { toast } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function Dashboard() {
     const [posts, setPosts] = useState([]);
@@ -14,7 +14,7 @@ export default function Dashboard() {
             setPosts(res.data);
         } catch (err) {
             console.error(err);
-            toast({ title: "Failed to load posts" });
+            Toaster("Failed to load posts");
         }
     };
 
@@ -26,10 +26,10 @@ export default function Dashboard() {
         try {
             const res = await API.post("/posts", payload);
             setPosts((prev) => [res.data, ...prev]);
-            toast({ title: "Post created" });
+            Toaster( "Post created");
         } catch (err) {
             console.error(err);
-            toast({ title: "Failed to create post" });
+            Toaster("Failed to create post");
         }
     };
 
@@ -44,7 +44,7 @@ export default function Dashboard() {
             );
         } catch (err) {
             console.error(err);
-            toast({ title: "Failed to toggle post" });
+            Toaster("Failed to toggle post");
         }
     };
 
@@ -52,10 +52,10 @@ export default function Dashboard() {
         try {
             await API.delete(`/posts/${id}`);
             setPosts((prev) => prev.filter((p) => p._id !== id));
-            toast({ title: "Post deleted" });
+            Toaster("Post deleted");
         } catch (err) {
             console.error(err);
-            toast({ title: "Failed to delete post" });
+            Toaster("Failed to delete post");
         }
     };
 

@@ -1,54 +1,75 @@
 import { useState } from "react";
-import { UseNavigate } from "react-router-dom";
-import {Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card , CardContent, CardHeader, CardFooter , CardTittle} from "@/components/ui/card";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Toaster } from "@/components/ui/sonner";
 
-export default function Login(){
-    const [email, setEmail] = useState("");
-    const [password,setPassword ] = useState("");
-    const navigate = UseNavigate();
-    const[loading , setLoading] = useState(false);
+export default function Login() {
+    const navigate = useNavigate();
+    const [form, setForm] = useState({ email: "", password: "" });
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = async () =>{
-        if(!email || !password) return alert("all fields are required");
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setLoading(true);
         try {
-            const res = await API.post("/auth/login",{email,password });
+            const res = await API.post("/auth/login", form);
             localStorage.setItem("token", res.data.token);
+            Toaster.success("Login successful!");
             navigate("/dashboard");
-        } catch (error) {
-            alert(error.response?.data?.message || "Login failed ");
-        } finally{
+        } catch (err) {
+            Toaster.error(err.response?.data?.message || "Login failed");
+        } finally {
             setLoading(false);
         }
     };
 
-    return(
-        <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-zinc-400">
-            <Card className="w-full max-w-md shadow-xl animate-fade">
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950 p-4">
+            <Card className="w-full max-w-md shadow-xl border border-zinc-200 dark:border-zinc-800">
                 <CardHeader>
-                    <CardTittle className="text-center text-2-xl font-bold">Log-in</CardTittle>
+                    <CardTitle className="text-center text-2xl font-bold text-zinc-800 dark:text-zinc-100">
+                        Welcome Back
+                    </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <Input
-                    type="email"
-                    placeholder="enter your email"
-                    value= {email}
-                    onChange ={e => setEmail(e.target.value)}
-                    />
-                    <Input
-                    type="Password"
-                    placeholder="enter your password"
-                    value= {password}
-                    onChange ={e => setPassword(e.target.value)}
-                    />
+
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                        <Input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            value={form.email}
+                            onChange={handleChange}
+                            required
+                        />
+                        <Input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            value={form.password}
+                            onChange={handleChange}
+                            required
+                        />
+                        <Button type="submit" disabled={loading} className="w-full mt-2">
+                            {loading ? "Logging in..." : "Login"}
+                        </Button>
+                    </form>
                 </CardContent>
-                <CardFooter className="flex justify-between">
-                    <Button onClick={handleLogin} disabled={loading} className="w-full">
-                        {loading ? "Logging in ......." : "Log in"}
-                    </Button>
+
+                <CardFooter className="flex flex-col items-center text-sm text-zinc-600 dark:text-zinc-400">
+                    <p>
+                        Don’t have an account?{" "}
+                        <Link to="/signup" className="text-blue-500 hover:underline">
+                            Sign up
+                        </Link>
+                    </p>
                 </CardFooter>
             </Card>
         </div>
