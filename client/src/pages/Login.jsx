@@ -20,9 +20,14 @@ export default function Login() {
         setLoading(true);
         try {
             const res = await API.post("/auth/login", form);
-            localStorage.setItem("token", res.data.token);
+            const { token, user } = res.data;
+            localStorage.setItem("token", token);
+            localStorage.setItem("role", user.role);
             Toaster.success("Login successful!");
-            navigate("/dashboard");
+
+            if (user.role === "Admin") navigate("/AdminDashboard");
+            else if (user.role === "School") navigate("/SchoolDashboard");
+            else if (user.role === "Student") navigate("/StudentDashboard");
         } catch (err) {
             Toaster.error(err.response?.data?.message || "Login failed");
         } finally {
@@ -31,7 +36,7 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-brown-300 dark:from-zinc-900 dark:to-zinc-950 p-4">
             <Card className="w-full max-w-md shadow-xl border border-zinc-200 dark:border-zinc-800">
                 <CardHeader>
                     <CardTitle className="text-center text-2xl font-bold text-zinc-800 dark:text-zinc-100">
@@ -72,6 +77,7 @@ export default function Login() {
                     </p>
                 </CardFooter>
             </Card>
+            <Toaster />
         </div>
     );
 }
