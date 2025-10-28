@@ -4,14 +4,15 @@ import API from "../services/api";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/sonner";
+import Toaster from "@/components/ui/sonner";
+import { toast } from "@/components/ui/toast";
 
 export default function Signup() {
     const navigate = useNavigate();
     const [form, setForm] = useState({
         email: "",
         password: "",
-        role: "Student",
+        role: "student",
     });
     const [loading, setLoading] = useState(false);
 
@@ -23,13 +24,23 @@ export default function Signup() {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await API.post("/auth/signup", form);
-            Toaster.success("Account created successfully!");
-            localStorage.setItem("token", res.data.token);
-            navigate("/dashboard");
+            // ensure role is normalized to lowercase before sending
+            const payload = { ...form, role: (form.role || "").toString().toLowerCase() };
+            const res = await API.post("/auth/signup", payload);
+            const { token, user } = res.data;
+            localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify(user));
+            toast.success("Account created successfully!");
+
+            // navigate according to role
+            const role = (user.role || "").toString().toLowerCase();
+            if (role === "admin") navigate("/admin/dashboard");
+            else if (role === "school") navigate("/school/dashboard");
+            else if (role === "student") navigate("/student/dashboard");
+            else navigate("/login");
         } catch (err) {
             console.error(err);
-            Toaster.error(err.response?.data?.message || "Signup failed");
+            toast.error(err.response?.data?.message || "Signup failed");
         } finally {
             setLoading(false);
         }
@@ -68,9 +79,9 @@ export default function Signup() {
                             onChange={handleChange}
                             className="border border-zinc-300 dark:border-zinc-700 bg-transparent rounded-lg px-3 py-2 text-sm"
                         >
-                            <option value="Student">Student</option>
-                            <option value="School">School</option>
-                            <option value="Admin">Admin</option>
+                            <option value="student">Student</option>
+                            <option value="school">School</option>
+                            <option value="admin">Admin</option>
                         </select>
 
                         <Button type="submit" disabled={loading} className="w-full mt-3">
@@ -86,6 +97,7 @@ export default function Signup() {
                     </Link>
                 </CardFooter>
             </Card>
+            <Toaster />
         </div>
     );
 }

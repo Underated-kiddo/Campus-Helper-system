@@ -10,9 +10,11 @@ import {
     LogOut,
     User,
 } from "lucide-react";
-import axios from "axios";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import API from "../services/api";
+import { toast } from "@/components/ui/toast"; // fixed toast import
 
-const AdminDashboard = () => {
+export default function AdminDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
     const [adminName, setAdminName] = useState("Admin Brad");
@@ -23,13 +25,13 @@ const AdminDashboard = () => {
         tickets: 0,
     });
     const [activities, setActivities] = useState([]);
-    const [chartData, setChartData] = useState([]);
+    const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch dashboard data from backend
         const fetchData = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/admin/dashboard"); 
+                const res = await API.get("/admin/dashboard");
                 const data = res.data;
 
                 setStats({
@@ -39,25 +41,33 @@ const AdminDashboard = () => {
                     tickets: data.supportTickets,
                 });
                 setActivities(data.recentActivities);
-                setChartData(data.userRegistrations);
                 setAdminName(data.adminName || "Admin Brad");
             } catch (err) {
                 console.error("Error fetching dashboard data:", err);
+                toast.error(
+                    err.response?.data?.message || "Failed to load dashboard data"
+                );
             }
         };
+
         fetchData();
     }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/login");
+        toast.success("Logged out successfully!");
+    };
 
     return (
         <div
             className={`flex min-h-screen transition-all duration-300 ${darkMode ? "bg-gray-900 text-gray-200" : "bg-gray-100 text-gray-900"
                 }`}
         >
-            {/* Sidebar */}
-            <motion.aside
-                animate={{ width: sidebarOpen ? 220 : 80 }}
-                className={`h-screen fixed left-0 top-0 shadow-lg p-4 transition-all duration-300 ${darkMode ? "bg-gray-800" : "bg-white"
-                    }`}
+
+            <aside
+                className={`fixed top-0 left-0 h-screen shadow-lg p-4 transition-all duration-300 ${darkMode ? "bg-gray-800" : "bg-white"
+                    } ${sidebarOpen ? "w-56" : "w-20"}`}
             >
                 <div className="flex justify-between items-center mb-8">
                     {sidebarOpen && <h1 className="text-xl font-bold">Campus Helper</h1>}
@@ -66,32 +76,34 @@ const AdminDashboard = () => {
                     </button>
                 </div>
 
-                <nav className="space-y-4">
+                <nav className="space-y-3">
                     {[
-                        { icon: <BarChart3 />, label: "Overview" },
-                        { icon: <Users />, label: "Manage Students" },
-                        { icon: <School />, label: "Manage Schools" },
-                        { icon: <Bell />, label: "Announcements" },
-                        { icon: <MessageSquare />, label: "Messages" },
-                        { icon: <Settings />, label: "Settings" },
+                        { icon: <BarChart3 />, label: "Overview", path: "/admin/overview" },
+                        { icon: <Users />, label: "Students", path: "/admin/students" },
+                        { icon: <School />, label: "Schools", path: "/admin/schools" },
+                        { icon: <Bell />, label: "Announcements", path: "/admin/announcements" },
+                        { icon: <MessageSquare />, label: "Messages", path: "/admin/messages" },
+                        { icon: <Settings />, label: "Settings", path: "/admin/settings" },
                     ].map((item, i) => (
-                        <motion.div
+                        <Link
                             key={i}
-                            whileHover={{ scale: 1.05 }}
-                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-700 cursor-pointer"
+                            to={item.path}
+                            className={`flex items-center gap-3 p-2 rounded-lg transition duration-150 ${location.pathname === item.path
+                                    ? "bg-blue-500 text-white"
+                                    : "hover:bg-blue-100 dark:hover:bg-gray-700"
+                                }`}
                         >
                             {item.icon}
                             {sidebarOpen && <span>{item.label}</span>}
-                        </motion.div>
+                        </Link>
                     ))}
                 </nav>
-            </motion.aside>
+            </aside>
 
-            {/* Main Section */}
             <main
-                className={`flex-1 ml-${sidebarOpen ? "56" : "20"} p-6 transition-all duration-300`}
+                className={`flex-1 transition-all duration-300 p-6 ${sidebarOpen ? "ml-56" : "ml-20"
+                    }`}
             >
-                {/* Navbar */}
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold">Welcome, {adminName}</h2>
                     <div className="flex items-center gap-4">
@@ -99,7 +111,7 @@ const AdminDashboard = () => {
                             onClick={() => setDarkMode(!darkMode)}
                             className="px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
                         >
-                            {darkMode ? "Light Mode" : "Dark Mode"}
+                            {darkMode ? "☀️" : "🌙"}
                         </button>
 
                         <div className="relative group">
@@ -108,12 +120,18 @@ const AdminDashboard = () => {
                                 alt="Admin Avatar"
                                 className="w-10 h-10 rounded-full cursor-pointer border-2 border-blue-500"
                             />
-                            <div className="absolute hidden group-hover:block right-0 mt-2 bg-white dark:bg-gray-700 shadow-lg rounded-lg w-32">
+                            <div className="absolute hidden group-hover:block right-0 mt-2 bg-white dark:bg-gray-700 shadow-lg rounded-lg w-32 z-50">
                                 <ul className="text-sm">
-                                    <li className="p-2 hover:bg-blue-100 dark:hover:bg-gray-600 flex items-center gap-2 cursor-pointer">
+                                    <li
+                                        className="p-2 hover:bg-blue-100 dark:hover:bg-gray-600 flex items-center gap-2 cursor-pointer"
+                                        onClick={() => navigate("/admin/settings")}
+                                    >
                                         <User size={16} /> Account
                                     </li>
-                                    <li className="p-2 hover:bg-blue-100 dark:hover:bg-gray-600 flex items-center gap-2 cursor-pointer">
+                                    <li
+                                        className="p-2 hover:bg-blue-100 dark:hover:bg-gray-600 flex items-center gap-2 cursor-pointer"
+                                        onClick={handleLogout}
+                                    >
                                         <LogOut size={16} /> Logout
                                     </li>
                                 </ul>
@@ -122,48 +140,35 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {[
                         { title: "Total Students", value: stats.students },
                         { title: "Total Schools", value: stats.schools },
-                        { title: "Recent Logins", value: stats.logins },
-                        { title: "Support Tickets", value: stats.tickets },
                     ].map((card, i) => (
-                        <motion.div
+                        <div
                             key={i}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.1 }}
                             className={`rounded-2xl shadow-lg p-5 ${darkMode ? "bg-gray-800" : "bg-white"
                                 }`}
                         >
                             <h3 className="text-lg font-semibold mb-2">{card.title}</h3>
                             <p className="text-3xl font-bold text-blue-500">{card.value}</p>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 
-                {/* Chart Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
+                <div
                     className={`rounded-2xl shadow-lg p-6 mb-8 ${darkMode ? "bg-gray-800" : "bg-white"
                         }`}
                 >
                     <h3 className="text-lg font-semibold mb-4">
                         User Registrations Over Time
                     </h3>
-                    {/* Placeholder for chart */}
                     <div className="h-40 flex items-center justify-center text-gray-400">
                         (Chart will render here)
                     </div>
-                </motion.div>
+                </div>
 
-                {/* Recent Activity Table */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
+                <div
                     className={`rounded-2xl shadow-lg p-6 ${darkMode ? "bg-gray-800" : "bg-white"
                         }`}
                 >
@@ -197,10 +202,8 @@ const AdminDashboard = () => {
                             )}
                         </tbody>
                     </table>
-                </motion.div>
+                </div>
             </main>
         </div>
     );
-};
-
-export default AdminDashboard;
+}

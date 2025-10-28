@@ -4,7 +4,8 @@ import API from "../services/api";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/sonner";
+import Toaster from "@/components/ui/sonner";
+import { toast } from "@/components/ui/toast";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -21,15 +22,19 @@ export default function Login() {
         try {
             const res = await API.post("/auth/login", form);
             const { token, user } = res.data;
+            // persist token and user (store user as JSON for other pages to read)
             localStorage.setItem("token", token);
-            localStorage.setItem("role", user.role);
-            Toaster.success("Login successful!");
+            localStorage.setItem("user", JSON.stringify(user));
+            toast.success("Login successful!");
 
-            if (user.role === "Admin") navigate("/AdminDashboard");
-            else if (user.role === "School") navigate("/SchoolDashboard");
-            else if (user.role === "Student") navigate("/StudentDashboard");
+            // normalize role checks to lowercase to match route/ProtectedRoutes conventions
+            const role = (user.role || "").toString().toLowerCase();
+            if (role === "admin") navigate("/admin/dashboard");
+            else if (role === "school") navigate("/school/dashboard");
+            else if (role === "student") navigate("/student/dashboard");
+            else navigate("/login");
         } catch (err) {
-            Toaster.error(err.response?.data?.message || "Login failed");
+            toast.error(err.response?.data?.message || "Login failed");
         } finally {
             setLoading(false);
         }

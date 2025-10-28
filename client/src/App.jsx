@@ -14,17 +14,14 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Admin Protected Routes */}
         <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Route>
 
-        {/* School Protected Routes */}
         <Route element={<ProtectedRoutes allowedRoles={["school"]} />}>
           <Route path="/school/dashboard" element={<SchoolDashboard />} />
         </Route>
 
-        {/* Student Protected Routes */}
         <Route element={<ProtectedRoutes allowedRoles={["student"]} />}>
           <Route path="/student/dashboard" element={<StudentDashboard />} />
         </Route>

@@ -10,9 +10,10 @@ import {
     LogOut,
     User,
 } from "lucide-react";
-import axios from "axios";
+import API from "../services/api";
+import { toast } from "@/components/ui/toast";
 
-const SchoolDashboard = () => {
+export default function SchoolDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
     const [schoolName, setSchoolName] = useState("My School");
@@ -28,7 +29,7 @@ const SchoolDashboard = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/school/dashboard"); 
+                const res = await API.get("/school/dashboard");
                 const data = res.data;
 
                 setSchoolName(data.schoolName);
@@ -42,6 +43,7 @@ const SchoolDashboard = () => {
                 setTopCourses(data.topCourses);
             } catch (err) {
                 console.error("Error fetching school dashboard data:", err);
+                toast.error(err.response?.data?.message || "Failed to load school dashboard");
             }
         };
 
@@ -54,10 +56,12 @@ const SchoolDashboard = () => {
                 }`}
         >
             {/* Sidebar */}
-            <motion.aside
-                animate={{ width: sidebarOpen ? 220 : 80 }}
+            <aside
                 className={`h-screen fixed left-0 top-0 shadow-lg p-4 transition-all duration-300 ${darkMode ? "bg-gray-800" : "bg-white"
                     }`}
+                style={{
+                    width: sidebarOpen ? "220px" : "80px",
+                }}
             >
                 <div className="flex justify-between items-center mb-8">
                     {sidebarOpen && <h1 className="text-xl font-bold">Campus Helper</h1>}
@@ -75,21 +79,21 @@ const SchoolDashboard = () => {
                         { icon: <BarChart3 />, label: "Reports" },
                         { icon: <Settings />, label: "Settings" },
                     ].map((item, i) => (
-                        <motion.div
+                        <div
                             key={i}
-                            whileHover={{ scale: 1.05 }}
-                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-700 cursor-pointer"
+                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-700 cursor-pointer transition-all duration-200"
                         >
                             {item.icon}
                             {sidebarOpen && <span>{item.label}</span>}
-                        </motion.div>
+                        </div>
                     ))}
                 </nav>
-            </motion.aside>
+            </aside>
 
             {/* Main Section */}
             <main
-                className={`flex-1 ml-${sidebarOpen ? "56" : "20"} p-6 transition-all duration-300`}
+                className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-[220px]" : "ml-[80px]"
+                    } p-6`}
             >
                 {/* Topbar */}
                 <div className="flex justify-between items-center mb-6">
@@ -99,7 +103,7 @@ const SchoolDashboard = () => {
                             onClick={() => setDarkMode(!darkMode)}
                             className="px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
                         >
-                            {darkMode ? "Light Mode" : "Dark Mode"}
+                            {darkMode ? "☀️" : "🌙"}
                         </button>
 
                         <div className="relative group">
@@ -130,26 +134,21 @@ const SchoolDashboard = () => {
                         { title: "Courses", value: stats.courses },
                         { title: "Announcements", value: stats.announcements },
                     ].map((card, i) => (
-                        <motion.div
+                        <div
                             key={i}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                            className={`rounded-2xl shadow-lg p-5 ${darkMode ? "bg-gray-800" : "bg-white"
+                            className={`rounded-2xl shadow-lg p-5 transition-transform duration-300 hover:scale-[1.02] ${darkMode ? "bg-gray-800" : "bg-white"
                                 }`}
                         >
                             <h3 className="text-lg font-semibold mb-2">{card.title}</h3>
                             <p className="text-3xl font-bold text-blue-500">{card.value}</p>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 
                 {/* Recent Activity */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
+                <div
                     className={`rounded-2xl shadow-lg p-6 mb-8 ${darkMode ? "bg-gray-800" : "bg-white"
-                        }`}
+                        } transition-all duration-300`}
                 >
                     <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
                     <ul className="space-y-3">
@@ -169,14 +168,12 @@ const SchoolDashboard = () => {
                             </p>
                         )}
                     </ul>
-                </motion.div>
+                </div>
 
                 {/* Top Courses */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
+                <div
                     className={`rounded-2xl shadow-lg p-6 ${darkMode ? "bg-gray-800" : "bg-white"
-                        }`}
+                        } transition-all duration-300`}
                 >
                     <h3 className="text-lg font-semibold mb-4">Top Performing Courses</h3>
                     <table className="w-full text-sm">
@@ -192,7 +189,7 @@ const SchoolDashboard = () => {
                                 topCourses.map((course, i) => (
                                     <tr
                                         key={i}
-                                        className="border-b border-gray-200 dark:border-gray-700"
+                                        className="border-b border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition-all"
                                     >
                                         <td className="p-2">{course.name}</td>
                                         <td className="p-2">{course.instructor}</td>
@@ -208,10 +205,8 @@ const SchoolDashboard = () => {
                             )}
                         </tbody>
                     </table>
-                </motion.div>
+                </div>
             </main>
         </div>
     );
-};
-
-export default SchoolDashboard;
+}

@@ -7,12 +7,14 @@ import {
     Menu,
     LogOut,
     User,
-    TrendingUp,
     Calendar,
 } from "lucide-react";
-import axios from "axios";
+import TutorForm from "@/components/TutorForm";
+import API from "../services/api";
+import { Link  } from "react-router-dom";
+import { toast } from "@/components/ui/toast";
 
-const StudentDashboard = () => {
+export default function StudentDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
     const [studentName, setStudentName] = useState("Student");
@@ -28,7 +30,7 @@ const StudentDashboard = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/student/dashboard"); 
+                const res = await API.get("/student/dashboard");
                 const data = res.data;
 
                 setStudentName(data.studentName);
@@ -42,6 +44,7 @@ const StudentDashboard = () => {
                 setSchedule(data.schedule);
             } catch (err) {
                 console.error("Error fetching student dashboard data:", err);
+                toast.error(err.response?.data?.message || "Failed to load student dashboard");
             }
         };
 
@@ -53,11 +56,10 @@ const StudentDashboard = () => {
             className={`flex min-h-screen transition-all duration-300 ${darkMode ? "bg-gray-900 text-gray-200" : "bg-gray-100 text-gray-900"
                 }`}
         >
-            {/* Sidebar */}
-            <motion.aside
-                animate={{ width: sidebarOpen ? 220 : 80 }}
+            <aside
                 className={`h-screen fixed left-0 top-0 shadow-lg p-4 transition-all duration-300 ${darkMode ? "bg-gray-800" : "bg-white"
                     }`}
+                style={{ width: sidebarOpen ? "220px" : "80px" }}
             >
                 <div className="flex justify-between items-center mb-8">
                     {sidebarOpen && <h1 className="text-xl font-bold">Campus Helper</h1>}
@@ -68,29 +70,31 @@ const StudentDashboard = () => {
 
                 <nav className="space-y-4">
                     {[
-                        { icon: <BookOpen />, label: "My Courses" },
-                        { icon: <Bell />, label: "Announcements" },
-                        { icon: <MessageSquare />, label: "Messages" },
-                        { icon: <Calendar />, label: "Schedule" },
-                        { icon: <Settings />, label: "Settings" },
+                        { icon: <BookOpen />, label: "Research Materials", path: "/pages/Research" },
+                        { icon: <Bell />, label: "Announcements", path: "/path/Announcements" },
+                        { icon: <MessageSquare />, label: "Tutors", path: "/path/Tutors" },
+                        { icon: <Calendar />, label: "Schedule", path: "/pages/schedule" },
+                        { icon: <Settings />, label: "Settings", path: "/pages/Settings" },
                     ].map((item, i) => (
-                        <motion.div
+                        <Link
                             key={i}
-                            whileHover={{ scale: 1.05 }}
-                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-700 cursor-pointer"
+                            to={item.path}
+                            className={`flex items-center gap-3 p-2 rounded-lg transition duration-150 ${location.pathname === item.path
+                                ? "bg-blue-500 text-white"
+                                : "hover:bg-blue-100 dark:hover:bg-gray-700"
+                                }`}
                         >
                             {item.icon}
                             {sidebarOpen && <span>{item.label}</span>}
-                        </motion.div>
+                        </Link>
                     ))}
                 </nav>
-            </motion.aside>
+            </aside>
 
-            {/* Main Section */}
             <main
-                className={`flex-1 ml-${sidebarOpen ? "56" : "20"} p-6 transition-all duration-300`}
+                className={`flex-1 p-6 transition-all duration-300 ${sidebarOpen ? "ml-[220px]" : "ml-[80px]"
+                    }`}
             >
-                {/* Navbar */}
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold">Welcome, {studentName}</h2>
                     <div className="flex items-center gap-4">
@@ -98,7 +102,7 @@ const StudentDashboard = () => {
                             onClick={() => setDarkMode(!darkMode)}
                             className="px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
                         >
-                            {darkMode ? "Light Mode" : "Dark Mode"}
+                            {darkMode ? "☀️" : "🌙"}
                         </button>
 
                         <div className="relative group">
@@ -121,32 +125,24 @@ const StudentDashboard = () => {
                     </div>
                 </div>
 
-                {/* Stats */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {[
-                        { title: "My Courses", value: stats.courses },
-                        { title: "Pending Assignments", value: stats.assignments },
                         { title: "New Announcements", value: stats.announcements },
                         { title: "Performance (%)", value: stats.performance },
                     ].map((card, i) => (
-                        <motion.div
+                        <div
                             key={i}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.1 }}
                             className={`rounded-2xl shadow-lg p-5 ${darkMode ? "bg-gray-800" : "bg-white"
                                 }`}
                         >
                             <h3 className="text-lg font-semibold mb-2">{card.title}</h3>
                             <p className="text-3xl font-bold text-blue-500">{card.value}</p>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 
-                {/* Announcements */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
+
+                <div
                     className={`rounded-2xl shadow-lg p-6 mb-8 ${darkMode ? "bg-gray-800" : "bg-white"
                         }`}
                 >
@@ -168,12 +164,11 @@ const StudentDashboard = () => {
                             </p>
                         )}
                     </ul>
-                </motion.div>
+                </div>
+
 
                 {/* Schedule */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
+                <div
                     className={`rounded-2xl shadow-lg p-6 ${darkMode ? "bg-gray-800" : "bg-white"
                         }`}
                 >
@@ -207,10 +202,13 @@ const StudentDashboard = () => {
                             )}
                         </tbody>
                     </table>
-                </motion.div>
+                </div>
+
+                <div className="p-6">
+                    <TutorForm />
+                </div>
+                
             </main>
         </div>
     );
-};
-
-export default StudentDashboard;
+}

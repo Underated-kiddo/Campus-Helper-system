@@ -6,7 +6,13 @@ const connectDB = require("./config/db");
 const app = express();
 connectDB();
 
-app.use(cors());
+// CORS - allow requests from the frontend and allow credentials (cookies/auth headers)
+const corsOptions = {
+	origin: process.env.CLIENT_URL || "http://localhost:5173",
+	credentials: true,
+	allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/auth" , require("./routes/authRoutes"));
