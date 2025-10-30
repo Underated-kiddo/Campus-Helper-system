@@ -31,7 +31,6 @@ export default function Lostnfound ()  {
                             key={item._id}
                             className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
                         >
-                            {/* Image section */}
                             <div className="w-full h-52 bg-gray-200 flex items-center justify-center">
                                 {item.image ? (
                                     <img
@@ -44,7 +43,6 @@ export default function Lostnfound ()  {
                                 )}
                             </div>
 
-                            {/* Details section */}
                             <div className="p-5">
                                 <h2 className="text-xl font-semibold text-gray-800 mb-2">
                                     {item.itemName}

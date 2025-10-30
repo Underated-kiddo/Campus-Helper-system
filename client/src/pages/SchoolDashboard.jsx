@@ -95,7 +95,6 @@ export default function SchoolDashboard() {
                 className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-[220px]" : "ml-[80px]"
                     } p-6`}
             >
-                {/* Topbar */}
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold">Welcome, {schoolName}</h2>
                     <div className="flex items-center gap-4">
@@ -126,7 +125,6 @@ export default function SchoolDashboard() {
                     </div>
                 </div>
 
-                {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {[
                         { title: "Total Students", value: stats.students },
@@ -145,7 +143,6 @@ export default function SchoolDashboard() {
                     ))}
                 </div>
 
-                {/* Recent Activity */}
                 <div
                     className={`rounded-2xl shadow-lg p-6 mb-8 ${darkMode ? "bg-gray-800" : "bg-white"
                         } transition-all duration-300`}
@@ -170,7 +167,6 @@ export default function SchoolDashboard() {
                     </ul>
                 </div>
 
-                {/* Top Courses */}
                 <div
                     className={`rounded-2xl shadow-lg p-6 ${darkMode ? "bg-gray-800" : "bg-white"
                         } transition-all duration-300`}

@@ -10,6 +10,8 @@ import {
     Calendar,
 } from "lucide-react";
 import TutorForm from "@/components/TutorForm";
+import FoundForm from "@/components/FoundForm";
+import ResearchForm from "@/components/ResearchForm";
 import API from "../services/api";
 import { Link  } from "react-router-dom";
 import { toast } from "@/components/ui/toast";
@@ -36,7 +38,6 @@ export default function StudentDashboard() {
                 setStudentName(data.studentName);
                 setStats({
                     courses: data.totalCourses,
-                    assignments: data.pendingAssignments,
                     announcements: data.newAnnouncements,
                     performance: data.performancePercentage,
                 });
@@ -166,8 +167,6 @@ export default function StudentDashboard() {
                     </ul>
                 </div>
 
-
-                {/* Schedule */}
                 <div
                     className={`rounded-2xl shadow-lg p-6 ${darkMode ? "bg-gray-800" : "bg-white"
                         }`}
@@ -206,6 +205,8 @@ export default function StudentDashboard() {
 
                 <div className="p-6">
                     <TutorForm />
+                    <FoundForm />
+                    <ResearchForm />
                 </div>
                 
             </main>

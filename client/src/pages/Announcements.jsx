@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,8 @@ export default function Announcements() {
     const [announcements, setAnnouncements] = useState([]);
     const [newAnnouncement, setNewAnnouncement] = useState({ title: "", message: "" });
     const [userRole, setUserRole] = useState(null);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
-    //  user role fetched from local storage token
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -22,12 +21,11 @@ export default function Announcements() {
             setUserRole(user.role);
         }
     }, []);
-
-//fetching  announcement from backend
+    
     useEffect(() => {
         const fetchAnnouncements = async () => {
             try {
-                const res = await API.get("/announcements");
+                const res = await API.get("http://localhost:5000/announcements");
                 setAnnouncements(res.data);
             } catch (error) {
                 console.error("Error fetching announcements:", error);
@@ -42,7 +40,6 @@ export default function Announcements() {
         setNewAnnouncement({ ...newAnnouncement, [e.target.name]: e.target.value });
     };
 
-    //  Post a new announcement (Admin only)
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -56,7 +53,6 @@ export default function Announcements() {
         }
     };
 
-    // Delete an announcement (Admin only)
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this announcement?")) return;
         try {
@@ -75,7 +71,6 @@ export default function Announcements() {
                 Campus Announcements
             </h1>
 
-            {/*  Admin form to post announcement */}
             {userRole === "admin" && (
                 <Card className="w-full max-w-2xl mb-8 shadow-xl border border-zinc-200 dark:border-zinc-800">
                     <CardHeader>
@@ -109,7 +104,6 @@ export default function Announcements() {
                 </Card>
             )}
 
-            {/*  Display Announcements */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
                 {announcements.length > 0 ? (
                     announcements.map((item) => (

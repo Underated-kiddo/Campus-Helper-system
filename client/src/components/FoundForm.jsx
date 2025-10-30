@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 export default function TutorForm() {
     const [formData, setFormData] = useState({
         name: "",
-        unit: "",
+        Item: "",
         description: "",
-        author: "",
+        contact: "",
     });
 
     const handleChange = (e) => {
@@ -18,11 +18,11 @@ export default function TutorForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await API.post("/researchmaterials", formData);
+            await API.post("/lostandfound", formData);
             alert("Submitted successfully!");
-            setFormData({ name: "", unit: "", description: "", author: "" });
+            setFormData({ name: "", item: "", description: "", contact: "" });
         } catch (err) {
-            console.error("Failed to submit material data:", err);
+            console.error("Failed to submit item data:", err);
             alert("Error submitting form");
         }
     };
@@ -33,23 +33,23 @@ export default function TutorForm() {
             className="max-w-md mx-auto bg-white shadow-md p-6 rounded-xl"
         >
             <h2 className="text-xl font-bold text-blue-700 mb-4">
-                Research material
+                Lost and found items
             </h2>
             <Input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="name of  topic"
+                placeholder="Full Name"
                 className="mb-3"
                 required
             />
             <Input
                 type="text"
-                name="unit"
+                name="item"
                 value={formData.unit}
                 onChange={handleChange}
-                placeholder="Unit name"
+                placeholder="Item you found"
                 className="mb-3"
                 required
             />
@@ -58,16 +58,16 @@ export default function TutorForm() {
                 name="description"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="description of material"
+                placeholder="Item description"
                 className="mb-3"
                 required
             />
             <Input
                 type="text"
-                name="author"
+                name="contact"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="Your name"
+                placeholder="Phone Number"
                 className="mb-3"
                 required
             />

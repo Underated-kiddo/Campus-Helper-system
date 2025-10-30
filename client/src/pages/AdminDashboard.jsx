@@ -13,11 +13,12 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { toast } from "@/components/ui/toast"; // fixed toast import
+import PostDialog  from "@/components/PostDialog";
 
 export default function AdminDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
-    const [adminName, setAdminName] = useState("Admin Brad");
+    const [adminName, setAdminName] = useState("Brad");
     const [stats, setStats] = useState({
         students: 0,
         schools: 0,
@@ -41,7 +42,7 @@ export default function AdminDashboard() {
                     tickets: data.supportTickets,
                 });
                 setActivities(data.recentActivities);
-                setAdminName(data.adminName || "Admin Brad");
+                setAdminName(data.adminName || " Brad");
             } catch (err) {
                 console.error("Error fetching dashboard data:", err);
                 toast.error(
@@ -82,7 +83,6 @@ export default function AdminDashboard() {
                         { icon: <Users />, label: "Students", path: "/admin/students" },
                         { icon: <School />, label: "Schools", path: "/admin/schools" },
                         { icon: <Bell />, label: "Announcements", path: "/admin/announcements" },
-                        { icon: <MessageSquare />, label: "Messages", path: "/admin/messages" },
                         { icon: <Settings />, label: "Settings", path: "/admin/settings" },
                     ].map((item, i) => (
                         <Link
@@ -202,6 +202,10 @@ export default function AdminDashboard() {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                <div className="space-y-3">
+                    <PostDialog />
                 </div>
             </main>
         </div>
