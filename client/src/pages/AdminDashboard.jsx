@@ -4,7 +4,6 @@ import {
     Users,
     School,
     Bell,
-    MessageSquare,
     Settings,
     Menu,
     LogOut,
@@ -13,7 +12,6 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { toast } from "@/components/ui/toast"; // fixed toast import
-import PostDialog from "@/components/PostDialog";
 
 export default function AdminDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -67,7 +65,6 @@ export default function AdminDashboard() {
                 : "bg-gradient-to-br from-blue-50 via-white to-[#e8dfd1] text-gray-900"
                 }`}
         >
-            {/* SIDEBAR */}
             <aside
                 className={`fixed top-0 left-0 h-screen shadow-2xl p-4 transition-all duration-300 ${darkMode
                     ? "bg-[#2c2a29] border-r border-gray-700"
@@ -90,11 +87,10 @@ export default function AdminDashboard() {
 
                 <nav className="space-y-3">
                     {[
-                        { icon: <BarChart3 />, label: "Overview", path: "/admin/overview" },
                         { icon: <Users />, label: "Students", path: "/admin/students" },
                         { icon: <School />, label: "Schools", path: "/admin/schools" },
-                        { icon: <Bell />, label: "Announcements", path: "/admin/announcements" },
-                        { icon: <Settings />, label: "Settings", path: "/admin/settings" },
+                        { icon: <Bell />, label: "Announcements", path: "/pages/Announcements" },
+                        { icon: <Settings />, label: "Settings", path: "/pages/Settings" },
                     ].map((item, i) => (
                         <Link
                             key={i}
@@ -111,7 +107,6 @@ export default function AdminDashboard() {
                 </nav>
             </aside>
 
-            {/* MAIN CONTENT */}
             <main
                 className={`flex-1 transition-all duration-300 p-6 ${sidebarOpen ? "ml-56" : "ml-20"
                     }`}
@@ -154,7 +149,6 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* STATS CARDS */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {[
                         { title: "Total Students", value: stats.students },
@@ -177,7 +171,6 @@ export default function AdminDashboard() {
                     ))}
                 </div>
 
-                {/* CHART PLACEHOLDER */}
                 <div
                     className={`rounded-2xl shadow-lg p-6 mb-8 ${darkMode
                         ? "bg-[#2f2b28]"
@@ -192,7 +185,6 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* RECENT ACTIVITY TABLE */}
                 <div
                     className={`rounded-2xl shadow-lg p-6 ${darkMode
                         ? "bg-[#2f2b28]"
@@ -237,7 +229,6 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="space-y-3 mt-6">
-                    <PostDialog />
                 </div>
             </main>
         </div>

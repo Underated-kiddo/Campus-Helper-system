@@ -1,16 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-    CardFooter,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Toaster from "@/components/ui/sonner";
 import { toast } from "@/components/ui/toast";
 
 export default function Login() {
@@ -18,9 +11,7 @@ export default function Login() {
     const [form, setForm] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -31,7 +22,7 @@ export default function Login() {
 
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(user));
-            toast.success("Login successful!");
+            toast({ title: "Success", description: "Login successful!" });
 
             const role = (user.role || "").toString().toLowerCase();
             if (role === "admin") navigate("/admin/dashboard");
@@ -39,26 +30,27 @@ export default function Login() {
             else if (role === "student") navigate("/student/dashboard");
             else navigate("/login");
         } catch (err) {
-            toast.error(err.response?.data?.message || "Login failed");
+            toast({
+                title: "Error",
+                description: err.response?.data?.message || "Login failed",
+                variant: "destructive",
+            });
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-400 dark:from-zinc-900 dark:via-zinc-950 dark:to-black p-6">
-            <Card className="w-full max-w-md shadow-2xl border border-white/20 dark:border-zinc-800 bg-white/30 dark:bg-zinc-900/60 backdrop-blur-lg rounded-2xl transition-transform duration-300 hover:scale-[1.02]">
+        <div className="min-h-screen flex items-center justify-center p-6 bg-[#e3f0ff]">
+            <div className="w-full max-w-md space-y-8 bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border-t-8 border-[#2b4b6f] transition-transform duration-300 hover:scale-[1.02]">
                 <CardHeader>
-                    <CardTitle className="text-center text-3xl font-bold text-zinc-900 dark:text-white">
+                    <CardTitle className="text-3xl font-bold text-[#2b4b6f] text-center mt-6">
                         👋 Welcome Back
                     </CardTitle>
                 </CardHeader>
 
                 <CardContent>
-                    <form
-                        onSubmit={handleSubmit}
-                        className="flex flex-col gap-5 mt-2"
-                    >
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-5 p-6">
                         <Input
                             type="email"
                             name="email"
@@ -66,7 +58,7 @@ export default function Login() {
                             value={form.email}
                             onChange={handleChange}
                             required
-                            className="bg-white/70 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                            className="border-[#2b4b6f] bg-white/70 text-[#2b4b6f] placeholder:text-[#7b3f00] focus:ring-2 focus:ring-[#2b4b6f] focus:outline-none"
                         />
                         <Input
                             type="password"
@@ -75,31 +67,30 @@ export default function Login() {
                             value={form.password}
                             onChange={handleChange}
                             required
-                            className="bg-white/70 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                            className="border-[#2b4b6f] bg-white/70 text-[#2b4b6f] placeholder:text-[#7b3f00] focus:ring-2 focus:ring-[#2b4b6f] focus:outline-none"
                         />
                         <Button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-2 font-semibold bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-lg shadow-lg transition-all duration-200 active:scale-95"
+                            className="w-full py-2 font-semibold bg-gradient-to-r from-[#2b4b6f] to-[#7b3f00] hover:from-[#1f3a5b] hover:to-[#5c2e00] text-white rounded-lg shadow-lg transition-all duration-200 active:scale-95"
                         >
                             {loading ? "Logging in..." : "Login"}
                         </Button>
                     </form>
                 </CardContent>
 
-                <CardFooter className="flex flex-col items-center text-sm text-zinc-700 dark:text-zinc-400 mt-2">
+                <CardFooter className="flex flex-col items-center text-sm text-[#2b4b6f] mb-6">
                     <p>
                         Don’t have an account?{" "}
                         <Link
                             to="/signup"
-                            className="text-purple-600 dark:text-purple-400 hover:underline font-medium"
+                            className="font-semibold underline hover:text-[#7b3f00]"
                         >
                             Sign up
                         </Link>
                     </p>
                 </CardFooter>
-            </Card>
-            <Toaster />
+            </div>
         </div>
     );
 }

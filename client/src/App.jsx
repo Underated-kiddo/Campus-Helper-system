@@ -18,6 +18,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
+        {/* Dashboards */}
         <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Route>
@@ -30,21 +31,28 @@ export default function App() {
           <Route path="/student/dashboard" element={<StudentDashboard />} />
         </Route>
 
-        <Route element={<ProtectedRoutes allowedRoles={["student", "admin"]} />}>
+        {/* Research -> admin + student */}
+        <Route element={<ProtectedRoutes allowedRoles={["admin", "student"]} />}>
           <Route path="/pages/research" element={<ResearchMaterials />} />
-
-          <Route element={<ProtectedRoutes  allowedRoles={["*"]} />}>
-          <Route path="/pages/Announcements" element={<Announcements />} />
         </Route>
 
-        <Route element={<ProtectedRoutes allowedRoles={["student","admin"]} />}>
-          <Route path="/pages/Tutors" element={<Tutors />} />
+        {/* Announcements -> everyone */}
+        <Route
+          element={<ProtectedRoutes allowedRoles={["admin", "student", "school"]} />}
+        >
+          <Route path="/pages/announcements" element={<Announcements />} />
         </Route>
 
-        <Route element={<ProtectedRoutes  allowedRoles={["*"]} />}>
+        {/* Tutors -> admin + student */}
+        <Route element={<ProtectedRoutes allowedRoles={["admin", "student"]} />}>
+          <Route path="/pages/tutors" element={<Tutors />} />
+        </Route>
+
+        {/* Settings -> everyone */}
+        <Route
+          element={<ProtectedRoutes allowedRoles={["admin", "student", "school"]} />}
+        >
           <Route path="/pages/settings" element={<Settings />} />
-        </Route>
-        
         </Route>
       </Routes>
     </BrowserRouter>

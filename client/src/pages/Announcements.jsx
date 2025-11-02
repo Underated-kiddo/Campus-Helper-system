@@ -5,7 +5,6 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import Toaster from "@/components/ui/sonner";
 import { toast } from "@/components/ui/toast";
 
 const BASE_URL = import.meta.env.VITE_API_URL; // ✅ Load from .env
@@ -154,7 +153,6 @@ export default function Announcements() {
                 )}
             </div>
 
-            <Toaster />
         </div>
     );
 }

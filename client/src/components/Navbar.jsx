@@ -8,24 +8,29 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
-// import { motion } from "framer-motion";
 
 export default function Navbar() {
     const navigate = useNavigate();
 
+    // ✅ Proper Logout
     const logout = () => {
         localStorage.removeItem("token");
-        navigate("/login");
+        localStorage.removeItem("user");
+        sessionStorage.clear();
+        navigate("/login", { replace: true });
+    };
+
+    // ✅ Navigate to settings
+    const goToSettings = () => {
+        navigate("/settings");
     };
 
     return (
-        <motion.nav
-            initial={{ y: -40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 80, damping: 12 }}
+        <nav
             className="backdrop-blur-md bg-white/30 dark:bg-zinc-900/30 
-                    border-b border-zinc-200 dark:border-zinc-800 
-                    sticky top-0 z-50 shadow-sm px-4 py-3 flex justify-between items-center"
+                border-b border-zinc-200 dark:border-zinc-800 
+                sticky top-0 z-50 shadow-sm px-4 py-3 flex justify-between items-center 
+                transition-all duration-300"
         >
             {/* Logo / Title */}
             <Link
@@ -35,7 +40,7 @@ export default function Navbar() {
                 Helper Campus
             </Link>
 
-            {/* Right Side Actions */}
+            {/* Right Side */}
             <div className="flex items-center gap-3">
                 <ThemeToggle />
 
@@ -50,25 +55,33 @@ export default function Navbar() {
                             <UserCircleIcon className="h-7 w-7 text-zinc-700 dark:text-zinc-200" />
                         </Button>
                     </DropdownMenuTrigger>
+
                     <DropdownMenuContent
                         align="end"
-                        className="w-44 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-lg border border-zinc-200 dark:border-zinc-700"
+                        className="w-44 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-lg 
+                        border border-zinc-200 dark:border-zinc-700 rounded-lg"
                     >
-                        <DropdownMenuItem
-                            onClick={() => navigate("/settings")}
-                            className="cursor-pointer hover:bg-blue-100 dark:hover:bg-zinc-800 transition"
-                        >
-                            Account
+                        {/* ✅ Use `asChild` so clicks register correctly */}
+                        <DropdownMenuItem asChild>
+                            <button
+                                onClick={goToSettings}
+                                className="w-full text-left px-2 py-1.5 rounded-md cursor-pointer hover:bg-blue-100 dark:hover:bg-zinc-800 transition"
+                            >
+                                Account
+                            </button>
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={logout}
-                            className="cursor-pointer text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition"
-                        >
-                            Logout
+
+                        <DropdownMenuItem asChild>
+                            <button
+                                onClick={logout}
+                                className="w-full text-left px-2 py-1.5 text-red-500 rounded-md cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30 transition"
+                            >
+                                Logout
+                            </button>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-        </motion.nav>
+        </nav>
     );
 }
