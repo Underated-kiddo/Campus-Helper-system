@@ -5,6 +5,10 @@ import AdminDashboard from "./pages/AdminDashboard";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
+import Settings from "./pages/Settings";
+import ResearchMaterials from "./pages/Research";
+import Announcements from "./pages/Announcements";
+import Tutors from "./pages/Tutors";
 
 export default function App() {
   return (
@@ -24,6 +28,23 @@ export default function App() {
 
         <Route element={<ProtectedRoutes allowedRoles={["student"]} />}>
           <Route path="/student/dashboard" element={<StudentDashboard />} />
+        </Route>
+
+        <Route element={<ProtectedRoutes allowedRoles={["student", "admin"]} />}>
+          <Route path="/pages/research" element={<ResearchMaterials />} />
+
+          <Route element={<ProtectedRoutes  allowedRoles={["*"]} />}>
+          <Route path="/pages/Announcements" element={<Announcements />} />
+        </Route>
+
+        <Route element={<ProtectedRoutes allowedRoles={["student","admin"]} />}>
+          <Route path="/pages/Tutors" element={<Tutors />} />
+        </Route>
+
+        <Route element={<ProtectedRoutes  allowedRoles={["*"]} />}>
+          <Route path="/pages/settings" element={<Settings />} />
+        </Route>
+        
         </Route>
       </Routes>
     </BrowserRouter>

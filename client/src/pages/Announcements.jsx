@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import Toaster from "@/components/ui/sonner";
 import { toast } from "@/components/ui/toast";
 
+const BASE_URL = import.meta.env.VITE_API_URL; // ✅ Load from .env
+
 export default function Announcements() {
     const [announcements, setAnnouncements] = useState([]);
     const [newAnnouncement, setNewAnnouncement] = useState({ title: "", message: "" });
@@ -21,11 +23,11 @@ export default function Announcements() {
             setUserRole(user.role);
         }
     }, []);
-    
+
     useEffect(() => {
         const fetchAnnouncements = async () => {
             try {
-                const res = await API.get("http://localhost:5000/announcements");
+                const res = await API.get(`${BASE_URL}/announcements`); // ✅ use env var
                 setAnnouncements(res.data);
             } catch (error) {
                 console.error("Error fetching announcements:", error);
@@ -43,7 +45,7 @@ export default function Announcements() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await API.post("/announcements", newAnnouncement);
+            const res = await API.post(`${BASE_URL}/announcements`, newAnnouncement); // ✅ use env var
             toast.success("Announcement posted successfully!");
             setAnnouncements([res.data, ...announcements]);
             setNewAnnouncement({ title: "", message: "" });
@@ -56,7 +58,7 @@ export default function Announcements() {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this announcement?")) return;
         try {
-            await API.delete(`/announcements/${id}`);
+            await API.delete(`${BASE_URL}/announcements/${id}`); // ✅ use env var
             setAnnouncements(announcements.filter((a) => a._id !== id));
             toast.success("Announcement deleted");
         } catch (err) {
@@ -66,20 +68,20 @@ export default function Announcements() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-brown-300 to-brown-200 dark:from-zinc-900 dark:to-zinc-950 p-6 flex flex-col items-center">
-            <h1 className="text-3xl font-bold text-center mb-6 text-zinc-800 dark:text-zinc-100">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-[#e8dfd1] to-[#c4a484] dark:from-gray-900 dark:via-gray-800 dark:to-[#3b2f2f] p-6 flex flex-col items-center transition-colors duration-500">
+            <h1 className="text-3xl font-extrabold text-center mb-8 bg-gradient-to-r from-blue-600 to-[#8b6b4c] bg-clip-text text-transparent drop-shadow-sm">
                 Campus Announcements
             </h1>
 
             {userRole === "admin" && (
-                <Card className="w-full max-w-2xl mb-8 shadow-xl border border-zinc-200 dark:border-zinc-800">
-                    <CardHeader>
-                        <CardTitle className="text-xl font-semibold text-center text-zinc-800 dark:text-zinc-100">
+                <Card className="w-full max-w-2xl mb-10 shadow-2xl border border-blue-100 dark:border-gray-700 bg-white/90 dark:bg-[#2f2b28]/90 backdrop-blur-sm transition-all hover:scale-[1.01]">
+                    <CardHeader className="border-b border-blue-100 dark:border-gray-700">
+                        <CardTitle className="text-xl font-semibold text-center text-blue-700 dark:text-[#d7b48c]">
                             Post New Announcement
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-3">
                             <Input
                                 type="text"
                                 name="title"
@@ -87,6 +89,7 @@ export default function Announcements() {
                                 onChange={handleChange}
                                 placeholder="Announcement Title"
                                 required
+                                className="border-blue-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-[#d7b48c]"
                             />
                             <Textarea
                                 name="message"
@@ -95,8 +98,12 @@ export default function Announcements() {
                                 placeholder="Write your announcement..."
                                 rows={4}
                                 required
+                                className="border-blue-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-[#d7b48c]"
                             />
-                            <Button type="submit" className="mt-2">
+                            <Button
+                                type="submit"
+                                className="mt-2 bg-gradient-to-r from-blue-600 to-[#8b6b4c] text-white font-semibold hover:opacity-90 transition-all"
+                            >
                                 Post Announcement
                             </Button>
                         </form>
@@ -104,34 +111,34 @@ export default function Announcements() {
                 </Card>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
                 {announcements.length > 0 ? (
                     announcements.map((item) => (
                         <Card
                             key={item._id}
-                            className="shadow-lg border border-zinc-200 dark:border-zinc-800 hover:scale-105 transition-transform bg-white/80 dark:bg-zinc-900/70"
+                            className="shadow-lg border border-blue-100 dark:border-gray-700 bg-white/90 dark:bg-[#2f2b28]/80 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 backdrop-blur-sm"
                         >
-                            <CardHeader>
-                                <CardTitle className="text-center text-lg font-semibold text-zinc-800 dark:text-zinc-100">
+                            <CardHeader className="border-b border-blue-100 dark:border-gray-700">
+                                <CardTitle className="text-center text-lg font-semibold text-blue-700 dark:text-[#d7b48c]">
                                     {item.title}
                                 </CardTitle>
                             </CardHeader>
 
                             <CardContent>
-                                <p className="text-zinc-700 dark:text-zinc-300 text-center">
+                                <p className="text-zinc-700 dark:text-gray-300 text-center leading-relaxed">
                                     {item.message}
                                 </p>
                             </CardContent>
 
-                            <CardFooter className="flex flex-col items-center text-sm text-zinc-600 dark:text-zinc-400">
-                                <p>Posted by: {item.postedBy || "Admin"}</p>
-                                <p>{new Date(item.date).toLocaleString()}</p>
+                            <CardFooter className="flex flex-col items-center text-sm text-gray-600 dark:text-gray-400">
+                                <p className="font-medium">Posted by: {item.postedBy || "Admin"}</p>
+                                <p className="text-xs italic">{new Date(item.date).toLocaleString()}</p>
 
                                 {userRole === "admin" && (
                                     <Button
                                         variant="destructive"
                                         size="sm"
-                                        className="mt-3"
+                                        className="mt-3 bg-gradient-to-r from-red-600 to-[#8b6b4c] hover:opacity-90 text-white shadow-md"
                                         onClick={() => handleDelete(item._id)}
                                     >
                                         Delete
@@ -141,7 +148,7 @@ export default function Announcements() {
                         </Card>
                     ))
                 ) : (
-                    <p className="text-zinc-700 dark:text-zinc-300 text-center col-span-full">
+                    <p className="text-gray-700 dark:text-gray-300 text-center col-span-full italic">
                         No announcements available right now.
                     </p>
                 )}

@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Toaster from "@/components/ui/sonner";
@@ -22,12 +28,11 @@ export default function Login() {
         try {
             const res = await API.post("/auth/login", form);
             const { token, user } = res.data;
-            // persist token and user (store user as JSON for other pages to read)
+
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(user));
             toast.success("Login successful!");
 
-            // normalize role checks to lowercase to match route/ProtectedRoutes conventions
             const role = (user.role || "").toString().toLowerCase();
             if (role === "admin") navigate("/admin/dashboard");
             else if (role === "school") navigate("/school/dashboard");
@@ -41,42 +46,54 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-brown-300 dark:from-zinc-900 dark:to-zinc-950 p-4">
-            <Card className="w-full max-w-md shadow-xl border border-zinc-200 dark:border-zinc-800">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-400 dark:from-zinc-900 dark:via-zinc-950 dark:to-black p-6">
+            <Card className="w-full max-w-md shadow-2xl border border-white/20 dark:border-zinc-800 bg-white/30 dark:bg-zinc-900/60 backdrop-blur-lg rounded-2xl transition-transform duration-300 hover:scale-[1.02]">
                 <CardHeader>
-                    <CardTitle className="text-center text-2xl font-bold text-zinc-800 dark:text-zinc-100">
-                        Welcome Back
+                    <CardTitle className="text-center text-3xl font-bold text-zinc-900 dark:text-white">
+                        👋 Welcome Back
                     </CardTitle>
                 </CardHeader>
 
                 <CardContent>
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                    <form
+                        onSubmit={handleSubmit}
+                        className="flex flex-col gap-5 mt-2"
+                    >
                         <Input
                             type="email"
                             name="email"
-                            placeholder="Email"
+                            placeholder="Enter your email"
                             value={form.email}
                             onChange={handleChange}
                             required
+                            className="bg-white/70 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
                         />
                         <Input
                             type="password"
                             name="password"
-                            placeholder="Password"
+                            placeholder="Enter your password"
                             value={form.password}
                             onChange={handleChange}
                             required
+                            className="bg-white/70 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
                         />
-                        <Button type="submit" disabled={loading} className="w-full mt-2">
+                        <Button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full py-2 font-semibold bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-lg shadow-lg transition-all duration-200 active:scale-95"
+                        >
                             {loading ? "Logging in..." : "Login"}
                         </Button>
                     </form>
                 </CardContent>
 
-                <CardFooter className="flex flex-col items-center text-sm text-zinc-600 dark:text-zinc-400">
+                <CardFooter className="flex flex-col items-center text-sm text-zinc-700 dark:text-zinc-400 mt-2">
                     <p>
                         Don’t have an account?{" "}
-                        <Link to="/signup" className="text-blue-500 hover:underline">
+                        <Link
+                            to="/signup"
+                            className="text-purple-600 dark:text-purple-400 hover:underline font-medium"
+                        >
                             Sign up
                         </Link>
                     </p>
