@@ -1,7 +1,7 @@
-import User from "../models/User.js";
-import Activity from "../models/Activity.js";
+const User = require("../models/User");
+const Activity = require("../models/Activity");
 
-export const getAdminDashboardData = async (req, res) => {
+const getAdminDashboardData = async (req, res) => {
     try {
         const totalStudents = await User.countDocuments({ role: "Student" });
         const totalSchools = await User.countDocuments({ role: "School" });
@@ -20,7 +20,7 @@ export const getAdminDashboardData = async (req, res) => {
                     count: { $sum: 1 },
                 },
             },
-            { $sort: { "_id": 1 } },
+            { $sort: { _id: 1 } },
         ]);
 
         const formattedRegistrations = userRegistrations.map((r) => ({
@@ -37,6 +37,11 @@ export const getAdminDashboardData = async (req, res) => {
             userRegistrations: formattedRegistrations,
         });
     } catch (err) {
-        res.status(500).json({ message: "Failed to fetch dashboard data", error: err.message });
+        res.status(500).json({
+            message: "Failed to fetch dashboard data",
+            error: err.message,
+        });
     }
 };
+
+module.exports = { getAdminDashboardData };

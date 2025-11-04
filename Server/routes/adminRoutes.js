@@ -1,9 +1,9 @@
-import express from "express";
-import { getAdminDashboardData } from "../controllers/adminController.js";
-import { protect, authorizeRoles } from "../middleware/authMiddleware.js";
+const express = require("express");
+const { getAdminDashboardData } = require("../controllers/adminController");
+const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 router.get("/dashboard", protect, authorizeRoles("Admin"), getAdminDashboardData);
 
-export default router;
+module.exports = router;

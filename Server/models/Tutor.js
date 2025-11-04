@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const tutorSchema = new mongoose.Schema(
     {
@@ -10,4 +10,4 @@ const tutorSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-export default mongoose.model("Tutor", tutorSchema);
+module.exports = mongoose.model("Tutor", tutorSchema);

@@ -1,26 +1,18 @@
-import express from "express";
-import Tutor from "../models/Tutor.js";
+const express = require("express");
+const {
+    createTutor,
+    getTutors,
+    getTutorById,
+    updateTutor,
+    deleteTutor,
+} = require("../controllers/tutorsController");
 
 const router = express.Router();
 
-//save the student info
-router.post("/", async (req, res) => {
-    try {
-        const newTutor = await Tutor.create(req.body);
-        res.status(201).json(newTutor);
-    } catch (error) {
-        res.status(500).json({ message: "Error saving tutor", error: error.message });
-    }
-});
+router.post("/", createTutor);
+router.get("/", getTutors);
+router.get("/:id", getTutorById);
+router.put("/:id", updateTutor);
+router.delete("/:id", deleteTutor);
 
-//retrieves the info
-router.get("/", async (req, res) => {
-    try {
-        const tutors = await Tutor.find().sort({ createdAt: -1 });
-        res.status(200).json(tutors);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching tutors", error: error.message });
-    }
-});
-
-export default router;
+module.exports = router;

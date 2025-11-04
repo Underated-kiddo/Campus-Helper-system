@@ -1,12 +1,12 @@
-require ("dotenv").config();
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 
 const app = express();
 connectDB();
 
-// CORS - allow requests from the frontend and allow credentials (cookies/auth headers)
+// CORS setup
 const corsOptions = {
 	origin: process.env.CLIENT_URL || "http://localhost:5173",
 	credentials: true,
@@ -15,7 +15,16 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-app.use("/api/auth" , require("./routes/authRoutes"));
+// Routes
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/lostnfound", require("./routes/lostnfoundRoutes"));
+app.use("/api/resources", require("./routes/resourceRoutes"));
+app.use("/api/tutors", require("./routes/tutorRoutes"));
+app.use("/api/announcements", require("./routes/announcementRoutes"));
 
-const PORT = process.env.PORT  || 5000 ;
-app.listen(PORT , () => console.log(`Server is running on http://localhost:${PORT}`));
+// Serve static files (like uploaded images) 
+app.use("/uploads", express.static("uploads"));
+
+// Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
