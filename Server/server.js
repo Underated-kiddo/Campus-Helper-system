@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
+const adminRoutes = require("./routes/adminRoutes");
+
 
 const app = express();
 connectDB();
@@ -20,7 +22,9 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/lostnfound", require("./routes/lostnfoundRoutes"));
 app.use("/api/resources", require("./routes/resourceRoutes"));
 app.use("/api/tutors", require("./routes/tutorRoutes"));
+app.use("/api/settings", require("./routes/settingsRoutes"));
 app.use("/api/announcements", require("./routes/announcementRoutes"));
+app.use("/api/admin", adminRoutes); 
 
 // Serve static files (like uploaded images) 
 app.use("/uploads", express.static("uploads"));

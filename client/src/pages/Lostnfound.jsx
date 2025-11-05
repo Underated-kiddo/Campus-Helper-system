@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import API from "../services/api";
 
-const BASE_URL = import.meta.env.VITE_API_URL; // ✅ Load from .env
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export default function Lostnfound() {
     const [items, setItems] = useState([]);
@@ -9,7 +9,7 @@ export default function Lostnfound() {
     useEffect(() => {
         const fetchLostItems = async () => {
             try {
-                const { data } = await API.get(`${BASE_URL}/lostnfound`); // ✅ use env var
+                const { data } = await API.get(`${BASE_URL}/lostnfound`);
                 setItems(data);
             } catch (err) {
                 console.error("Error fetching lost & found items:", err);
@@ -19,7 +19,7 @@ export default function Lostnfound() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-400 dark:from-zinc-900 dark:via-zinc-950 dark:to-black p-8 flex flex-col items-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-400 via-orange-300 to-orange-500 dark:from-zinc-900 dark:via-zinc-950 dark:to-black p-8 flex flex-col items-center">
             <h1 className="text-4xl font-extrabold text-white mb-10 text-center drop-shadow-lg">
                 Lost & Found Center 🕵️‍♂️
             </h1>
@@ -33,9 +33,9 @@ export default function Lostnfound() {
                     {items.map((item) => (
                         <div
                             key={item._id}
-                            className="rounded-2xl overflow-hidden shadow-2xl backdrop-blur-lg border border-white/20 bg-white/20 dark:bg-zinc-900/50 transition-transform duration-300 hover:scale-[1.03] hover:shadow-purple-400/40"
+                            className="rounded-2xl overflow-hidden shadow-2xl backdrop-blur-lg border border-white/20 bg-gradient-to-br from-blue-300 via-orange-200 to-orange-400 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-700 transition-transform duration-300 hover:scale-[1.03] hover:shadow-orange-500/50"
                         >
-                            <div className="w-full h-56 bg-gradient-to-tr from-purple-200 to-indigo-300 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center">
+                            <div className="w-full h-56 bg-gradient-to-tr from-blue-200 to-orange-300 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center">
                                 {item.image ? (
                                     <img
                                         src={item.image}
@@ -58,11 +58,10 @@ export default function Lostnfound() {
                                     <p>
                                         <strong>Status:</strong>{" "}
                                         <span
-                                            className={`font-semibold ${
-                                                item.status === "Lost"
+                                            className={`font-semibold ${item.status === "Lost"
                                                     ? "text-red-500"
                                                     : "text-green-400"
-                                            }`}
+                                                }`}
                                         >
                                             {item.status}
                                         </span>

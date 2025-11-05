@@ -1,17 +1,21 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-    name: { type: String, default: "" },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ["student", "school", "admin"], default: "student" },
-
-    // Optional fields for settings
-    bio: { type: String, default: "" },
-    contact: { type: String, default: "" },
+    name: String,
+    email: String,
+    role: {
+        type: String,
+        enum: ["admin", "student", "school"],
+        required: true,
+    },
+    bio: String,
+    contact: String,
     notifications: { type: Boolean, default: true },
     privateMode: { type: Boolean, default: false },
-    profilePic: { type: String, default: null }, 
-}, { timestamps: true });
+    profilePic: String,
+    password: String,
+},
+{ timestamps: true }
+);
 
 module.exports = mongoose.model("User", userSchema);

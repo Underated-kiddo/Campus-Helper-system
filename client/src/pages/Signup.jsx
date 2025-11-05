@@ -53,7 +53,12 @@ export default function Signup() {
                     window.location.href = "/student/dashboard";
                     break;
                 default:
-                    window.location.href = "/";
+                    toast({
+                        title: "Error",
+                        description: "Unknown user role — contact support",
+                        variant: "destructive",
+                    });
+                    window.location.href = "/login";
             }
         } catch (err) {
             toast({

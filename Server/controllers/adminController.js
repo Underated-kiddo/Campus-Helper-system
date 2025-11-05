@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const Activity = require("../models/Activity");
 
 const getAdminDashboardData = async (req, res) => {
     try {
@@ -8,10 +7,6 @@ const getAdminDashboardData = async (req, res) => {
         const recentLogins = await User.find().sort({ lastLogin: -1 }).limit(10);
         const supportTickets = 12; // Replace with actual collection later
 
-        const recentActivity = await Activity.find()
-            .sort({ createdAt: -1 })
-            .limit(5)
-            .select("action createdAt");
 
         const userRegistrations = await User.aggregate([
             {
@@ -31,9 +26,6 @@ const getAdminDashboardData = async (req, res) => {
         res.status(200).json({
             totalStudents,
             totalSchools,
-            recentLogins: recentLogins.length,
-            supportTickets,
-            recentActivity,
             userRegistrations: formattedRegistrations,
         });
     } catch (err) {

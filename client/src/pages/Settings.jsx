@@ -36,7 +36,20 @@ export default function Settings() {
     const [profilePic, setProfilePic] = useState(null);
     const [previewUrl, setPreviewUrl] = useState("");
     const [loading, setLoading] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
+    const [isDark, setIsDark] = useState(false);
+
+    // Sync theme globally
+    useEffect(() => {
+        const updateTheme = () => {
+            const theme = localStorage.getItem("theme") || "light";
+            document.documentElement.classList.toggle("dark", theme === "dark");
+            setIsDark(theme === "dark");
+        };
+
+        updateTheme(); 
+        window.addEventListener("storage", updateTheme); 
+        return () => window.removeEventListener("storage", updateTheme);
+    }, []);
 
     useEffect(() => {
         async function loadSettings() {
@@ -61,19 +74,15 @@ export default function Settings() {
                 });
             }
         }
-
-        const theme = localStorage.getItem("theme");
-        setDarkMode(theme === "dark");
-        document.documentElement.classList.toggle("dark", theme === "dark");
-
         loadSettings();
     }, []);
 
     const toggleTheme = () => {
-        const newTheme = darkMode ? "light" : "dark";
-        setDarkMode(!darkMode);
-        document.documentElement.classList.toggle("dark", newTheme === "dark");
+        const newTheme = isDark ? "light" : "dark";
         localStorage.setItem("theme", newTheme);
+        document.documentElement.classList.toggle("dark", newTheme === "dark");
+        setIsDark(!isDark);
+        window.dispatchEvent(new Event("storage")); // notify all pages
     };
 
     const handleProfilePicChange = (e) => {
@@ -130,7 +139,6 @@ export default function Settings() {
         }
     }
 
-    // Save settings
     async function handleSubmit(e) {
         e.preventDefault();
         setLoading(true);
@@ -194,21 +202,19 @@ export default function Settings() {
 
     return (
         <div
-            className={`min-h-screen transition-all duration-500 ${darkMode
-                ? "bg-[#1a1a1a] text-white"
-                : "bg-[#f4f2ee] text-gray-900"
-            } flex justify-center items-start p-8`}
+            className={`min-h-screen transition-all duration-500 ${isDark ? "bg-[#1a1a1a] text-white" : "bg-[#f4f2ee] text-gray-900"
+                } flex justify-center items-start p-8`}
         >
             <div className="w-full max-w-3xl space-y-8">
                 <div className="flex justify-end mb-4">
                     <Button
                         onClick={toggleTheme}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-md ${darkMode
-                            ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
-                            : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
-                        }`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-md ${isDark
+                                ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
+                                : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
+                            }`}
                     >
-                        {darkMode ? (
+                        {isDark ? (
                             <>
                                 <Sun size={16} /> Light Mode
                             </>
@@ -249,10 +255,18 @@ export default function Settings() {
                     </div>
                 </div>
 
-                <Card className={`border ${darkMode ? "bg-[#2c2b29] border-[#3f3b38]" : "bg-white border-[#d4c4b0]"}`}>
+                {/* Account Settings */}
+                <Card
+                    className={`border ${isDark ? "bg-[#2c2b29] border-[#3f3b38]" : "bg-white border-[#d4c4b0]"
+                        }`}
+                >
                     <CardHeader>
-                        <CardTitle className="text-[#2b4b6f] dark:text-[#d2b48c]">Account Settings</CardTitle>
-                        <CardDescription>Manage your personal information and preferences</CardDescription>
+                        <CardTitle className="text-[#2b4b6f] dark:text-[#d2b48c]">
+                            Account Settings
+                        </CardTitle>
+                        <CardDescription>
+                            Manage your personal information and preferences
+                        </CardDescription>
                     </CardHeader>
 
                     <CardContent>
@@ -262,20 +276,21 @@ export default function Settings() {
                                     <Label>Name</Label>
                                     <Input
                                         value={settings.name}
-                                        onChange={(e) => setSettings({ ...settings, name: e.target.value })}
+                                        onChange={(e) =>
+                                            setSettings({ ...settings, name: e.target.value })
+                                        }
                                         placeholder="Your full name"
-                                        className="border-[#c2b19c] dark:border-[#3f3b38]"
                                     />
                                 </div>
-
                                 <div>
                                     <Label>Email</Label>
                                     <Input
                                         type="email"
                                         value={settings.email}
-                                        onChange={(e) => setSettings({ ...settings, email: e.target.value })}
+                                        onChange={(e) =>
+                                            setSettings({ ...settings, email: e.target.value })
+                                        }
                                         placeholder="example@email.com"
-                                        className="border-[#c2b19c] dark:border-[#3f3b38]"
                                     />
                                 </div>
                             </div>
@@ -284,9 +299,10 @@ export default function Settings() {
                                 <Label>Bio</Label>
                                 <Textarea
                                     value={settings.bio}
-                                    onChange={(e) => setSettings({ ...settings, bio: e.target.value })}
+                                    onChange={(e) =>
+                                        setSettings({ ...settings, bio: e.target.value })
+                                    }
                                     placeholder="Tell others about yourself..."
-                                    className="border-[#c2b19c] dark:border-[#3f3b38]"
                                 />
                             </div>
 
@@ -294,9 +310,10 @@ export default function Settings() {
                                 <Label>Contact Info</Label>
                                 <Input
                                     value={settings.contact}
-                                    onChange={(e) => setSettings({ ...settings, contact: e.target.value })}
+                                    onChange={(e) =>
+                                        setSettings({ ...settings, contact: e.target.value })
+                                    }
                                     placeholder="e.g. +254700000000"
-                                    className="border-[#c2b19c] dark:border-[#3f3b38]"
                                 />
                             </div>
 
@@ -305,9 +322,11 @@ export default function Settings() {
                                     <Label>Account Type</Label>
                                     <Select
                                         value={settings.accountType}
-                                        onValueChange={(val) => setSettings({ ...settings, accountType: val })}
+                                        onValueChange={(val) =>
+                                            setSettings({ ...settings, accountType: val })
+                                        }
                                     >
-                                        <SelectTrigger className="border-[#c2b19c] dark:border-[#3f3b38]">
+                                        <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -323,9 +342,16 @@ export default function Settings() {
                                     <div className="flex items-center gap-2 mt-2">
                                         <Switch
                                             checked={settings.notifications}
-                                            onCheckedChange={(val) => setSettings({ ...settings, notifications: val })}
+                                            onCheckedChange={(val) =>
+                                                setSettings({
+                                                    ...settings,
+                                                    notifications: val,
+                                                })
+                                            }
                                         />
-                                        <span>{settings.notifications ? "Enabled" : "Disabled"}</span>
+                                        <span>
+                                            {settings.notifications ? "Enabled" : "Disabled"}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -333,17 +359,19 @@ export default function Settings() {
                             <div className="flex items-center gap-2">
                                 <Switch
                                     checked={settings.privateMode}
-                                    onCheckedChange={(val) => setSettings({ ...settings, privateMode: val })}
+                                    onCheckedChange={(val) =>
+                                        setSettings({ ...settings, privateMode: val })
+                                    }
                                 />
                                 <Label>Private Mode</Label>
                             </div>
 
                             <Button
                                 type="submit"
-                                className={`w-full ${darkMode
-                                    ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
-                                    : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
-                                }`}
+                                className={`w-full ${isDark
+                                        ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
+                                        : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
+                                    }`}
                                 disabled={loading}
                             >
                                 {loading ? "Saving..." : "Save Changes"}
@@ -353,14 +381,18 @@ export default function Settings() {
                 </Card>
 
                 <Card
-                    className={`border-t-4 ${darkMode
-                        ? "bg-[#2c2b29] border-[#3f3b38] border-t-[#d2b48c]"
-                        : "bg-white border-[#d4c4b0] border-t-[#2b4b6f]"
-                    }`}
+                    className={`border-t-4 ${isDark
+                            ? "bg-[#2c2b29] border-[#3f3b38] border-t-[#d2b48c]"
+                            : "bg-white border-[#d4c4b0] border-t-[#2b4b6f]"
+                        }`}
                 >
                     <CardHeader>
-                        <CardTitle className="text-[#2b4b6f] dark:text-[#d2b48c]">Security</CardTitle>
-                        <CardDescription>Change password or delete your account</CardDescription>
+                        <CardTitle className="text-[#2b4b6f] dark:text-[#d2b48c]">
+                            Security
+                        </CardTitle>
+                        <CardDescription>
+                            Change password or delete your account
+                        </CardDescription>
                     </CardHeader>
 
                     <CardContent className="space-y-4">
@@ -377,10 +409,10 @@ export default function Settings() {
 
                             <Button
                                 type="submit"
-                                className={`w-full ${darkMode
-                                    ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
-                                    : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
-                                }`}
+                                className={`w-full ${isDark
+                                        ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
+                                        : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
+                                    }`}
                                 disabled={loading}
                             >
                                 {loading ? "Changing..." : "Change Password"}

@@ -7,6 +7,7 @@ import API from "@/services/api";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BookAIcon } from "lucide-react";
 import { BookOpen } from "lucide-react";
+import { Box } from "lucide-react";
 
 export default function AdminDashboard() {
     const [darkMode, setDarkMode] = useState(false);
@@ -80,10 +81,11 @@ export default function AdminDashboard() {
 
                     <nav className="space-y-3">
                         {[
-                            { icon: <BookOpen />, label: "Research ", path: "/Research" },
-                            { icon: <Users />, label: "Lost & Found", path: "/Lostnfound" },
-                            { icon: <Building />, label: "Announcements", path: "/Announcements" },
-                            { icon: <Settings />, label: "Settings", path: "/Settings" },
+                            { icon: <BookOpen />, label: "Research ", path: "/api/research" },
+                            { icon: <Box />, label: "Lost & Found", path: "/api/lostnfound" },
+                            { icon: <Users />, label: "Tutors", path: "/api/tutors" },
+                            { icon: <Building />, label: "Announcements", path: "/api/announcements" },
+                            { icon: <Settings />, label: "Settings", path: "/api/settings" },
                         ].map((item, i) => (
                             <Link
                                 key={i}

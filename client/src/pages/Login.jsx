@@ -1,15 +1,21 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/toast";
+import toast from "@/components/ui/toast";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
-    const navigate = useNavigate();
     const [form, setForm] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleChange = (e) =>
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,42 +28,63 @@ export default function Login() {
             const res = await API.post("/auth/login", form);
             const { token, user } = res.data;
 
-            if (!user || !user.name) {
+            if (!user || !user.name)
                 throw new Error("Invalid user data received from server");
-            }
 
-            // ✅ Store user info + token for later dashboard use
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(user));
 
-            toast({ title: "Success", description: `Welcome back, ${user.name}!` });
+            toast.success(`Welcome back, ${user.name}!`);
 
-            // ✅ Redirect based on role
-            const role = (user.role || "").toLowerCase();
-            switch (role) {
-                case "admin":
-                    navigate("/admin/dashboard");
-                    break;
-                case "school":
-                    navigate("/school/dashboard");
-                    break;
-                case "student":
-                    navigate("/student/dashboard");
-                    break;
-                default:
-                    toast({
-                        title: "Error",
-                        description: "Unknown user role — contact support",
-                        variant: "destructive",
-                    });
-                    navigate("/login");
-            }
+            setTimeout(() => {
+                const role = (user.role || "").toLowerCase();
+
+                switch (role) {
+                    case "admin":
+                        navigate("/admin/dashboard");
+                        break;
+                    case "school":
+                        navigate("/school/dashboard");
+                        break;
+                    case "student":
+                        navigate("/student/dashboard");
+                        break;
+                    default:
+                        toast.error("Unknown user role — contact support");
+                        navigate("/login");
+                }
+            }, 500);
         } catch (err) {
-            toast({
-                title: "Error",
-                description: err.response?.data?.message || err.message || "Login failed",
-                variant: "destructive",
-            });
+            console.error("Login error:", err);
+
+            // 🧠 Determine the likely cause
+            let message = "Login failed due to an unexpected issue.";
+            if (err.response) {
+                const { status, data } = err.response;
+
+                if (status === 400) {
+                    message =
+                        data?.message ||
+                        "Invalid email or password. Please double-check and try again.";
+                } else if (status === 401) {
+                    message = "Unauthorized — your credentials are incorrect.";
+                } else if (status === 404) {
+                    message = "Server endpoint not found — check backend routes.";
+                } else if (status >= 500) {
+                    message = "Server error — please try again later.";
+                } else {
+                    message =
+                        data?.message || `Unexpected error (code ${status}).`;
+                }
+            } else if (err.request) {
+                message =
+                    "Cannot connect to the server — check your internet connection or backend status.";
+            } else {
+                message = err.message || "Something went wrong.";
+            }
+
+            // 🔥 Display detailed error toast
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -73,7 +100,10 @@ export default function Login() {
                 </CardHeader>
 
                 <CardContent>
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-5 p-6">
+                    <form
+                        onSubmit={handleSubmit}
+                        className="flex flex-col gap-5 p-6"
+                    >
                         <Input
                             type="email"
                             name="email"

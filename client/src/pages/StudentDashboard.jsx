@@ -13,7 +13,7 @@ import FoundForm from "@/components/FoundForm";
 import ResearchForm from "@/components/ResearchForm";
 import API from "@/services/api";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { toast } from "@/components/ui/toast"; // ✅ Import toast directly
+import { toast } from "@/components/ui/toast"; 
 
 export default function StudentDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -99,10 +99,10 @@ export default function StudentDashboard() {
 
                     <nav className="space-y-3">
                         {[
-                            { icon: <BookOpen />, label: "Research", path: "/Research" },
-                            { icon: <Bell />, label: "Announcements", path: "/Announcements" },
-                            { icon: <MessageSquare />, label: "Tutors", path: "/Tutors" },
-                            { icon: <Settings />, label: "Settings", path: "/Settings" },
+                            { icon: <BookOpen />, label: "Research", path: "/api/research" },
+                            { icon: <Bell />, label: "Announcements", path: "/api/announcements" },
+                            { icon: <MessageSquare />, label: "Tutors", path: "/api/tutors" },
+                            { icon: <Settings />, label: "Settings", path: "/api/settings" },
                         ].map((item, i) => (
                             <Link
                                 key={i}

@@ -1,27 +1,63 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-// checks token and sets req.user
-exports.protect = (req, res, next) => {
-    const auth = req.headers.authorization;
-    if (!auth || !auth.startsWith("Bearer ")) return res.status(401).json({ message: "No token given" });
+// 🔒 Middleware to protect routes
+const protect = async (req, res, next) => {
+    let token;
 
-    const token = auth.split(" ")[1];
+    // Check for token in headers or cookies
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith("Bearer")
+    ) {
+        token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies && req.cookies.token) {
+        token = req.cookies.token;
+    }
+
+    // If no token, deny access
+    if (!token) {
+        return res.status(401).json({ message: "Not authorized, no token" });
+    }
+
     try {
+        // Verify JWT token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
+
+        // Fetch the user from DB (excluding password)
+        const user = await User.findById(decoded.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Attach user object to request
+        req.user = user;
+
         next();
     } catch (error) {
-        console.error("Token verification failed:", error);
-        return res.status(403).json({ message: "Invalid token" });
+        console.error("Auth Error:", error);
+        return res.status(401).json({ message: "Not authorized, invalid token" });
     }
 };
 
-// checks the roles - accepts a string or array of allowed roles
-exports.authorize = (roles) => {
-    const allowed = Array.isArray(roles) ? roles : [roles];
+// 🧠 Middleware for role-based access
+const authorizeRoles = (...allowedRoles) => {
     return (req, res, next) => {
-        if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-        if (!allowed.includes(req.user.role)) return res.status(403).json({ message: "Forbidden" });
+        // If user or role is missing
+        if (!req.user || !req.user.role) {
+            return res
+                .status(401)
+                .json({ message: "User role missing or unauthorized" });
+        }
+
+        // Check if the user's role is in the allowed list
+        if (!allowedRoles.map((r) => r.toLowerCase()).includes(req.user.role.toLowerCase())) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         next();
     };
 };
+
+module.exports = { protect, authorizeRoles };
