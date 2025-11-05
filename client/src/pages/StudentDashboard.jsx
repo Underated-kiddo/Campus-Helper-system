@@ -12,8 +12,8 @@ import TutorForm from "@/components/TutorForm";
 import FoundForm from "@/components/FoundForm";
 import ResearchForm from "@/components/ResearchForm";
 import API from "@/services/api";
-import { Link, useLocation } from "react-router-dom";
-import { toast } from "@/components/ui/toast";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/toast"; // ✅ Import toast directly
 
 export default function StudentDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -25,14 +25,22 @@ export default function StudentDashboard() {
     });
     const [announcements, setAnnouncements] = useState([]);
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        // Load student name from localStorage
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            const parsed = JSON.parse(storedUser);
+            setStudentName(parsed.name || "Student");
+        }
+
+        // Fetch dashboard data
         const fetchDashboardData = async () => {
             try {
                 const res = await API.get("/student/dashboard");
                 const data = res.data;
 
-                setStudentName(data.studentName || "Student");
                 setStats({
                     announcements: data.newAnnouncements || 0,
                     performance: data.performancePercentage || 0,
@@ -40,12 +48,27 @@ export default function StudentDashboard() {
                 setAnnouncements(data.announcements || []);
             } catch (err) {
                 console.error("Error fetching student dashboard data:", err);
-                toast.error(err.response?.data?.message || "Failed to load student dashboard");
+                toast({
+                    title: "Error",
+                    description:
+                        err.response?.data?.message || "Failed to load dashboard data",
+                    variant: "destructive",
+                });
             }
         };
 
         fetchDashboardData();
     }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        toast({
+            title: "Logged out",
+            description: "You have been logged out successfully.",
+        });
+        navigate("/login");
+    };
 
     return (
         <div
@@ -65,7 +88,9 @@ export default function StudentDashboard() {
                 <div>
                     <div className="flex justify-between items-center mb-10">
                         {sidebarOpen && (
-                            <h1 className="text-xl font-bold tracking-wide">Campus Helper</h1>
+                            <h1 className="text-xl font-bold tracking-wide">
+                                Campus Helper
+                            </h1>
                         )}
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -100,9 +125,12 @@ export default function StudentDashboard() {
                 <div className="mt-8 border-t border-white/20 pt-4">
                     <div className="flex items-center gap-3 p-2 hover:bg-white/15 rounded-xl cursor-pointer">
                         <User size={18} />
-                        {sidebarOpen && <span>Profile</span>}
+                        {sidebarOpen && <span>{studentName}</span>}
                     </div>
-                    <div className="flex items-center gap-3 p-2 hover:bg-white/15 rounded-xl cursor-pointer">
+                    <div
+                        className="flex items-center gap-3 p-2 hover:bg-white/15 rounded-xl cursor-pointer"
+                        onClick={handleLogout}
+                    >
                         <LogOut size={18} />
                         {sidebarOpen && <span>Logout</span>}
                     </div>
@@ -126,57 +154,10 @@ export default function StudentDashboard() {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                    {[
-                        { title: "New Announcements", value: stats.announcements },
-                        { title: "Performance (%)", value: stats.performance },
-                    ].map((card, i) => (
-                        <div
-                            key={i}
-                            className={`rounded-2xl shadow-xl p-6 backdrop-blur-md border border-[#2b4b6f]/30 ${darkMode
-                                    ? "bg-[#2c2a26]/70 border-[#7b3f00]/40"
-                                    : "bg-white/80"
-                                }`}
-                        >
-                            <h3 className="text-lg font-semibold mb-2 text-[#7b3f00] dark:text-[#c7a074]">
-                                {card.title}
-                            </h3>
-                            <p className="text-4xl font-bold text-[#2b4b6f]">{card.value}</p>
-                        </div>
-                    ))}
-                </div>
-
-                <div
-                    className={`rounded-2xl shadow-xl p-6 mb-10 backdrop-blur-md ${darkMode ? "bg-[#2c2a26]/70" : "bg-white/80"
-                        }`}
-                >
-                    <h3 className="text-xl font-semibold mb-4 text-[#7b3f00] dark:text-[#c7a074]">
-                        Latest Announcements
-                    </h3>
-                    <ul className="space-y-3">
-                        {announcements.length > 0 ? (
-                            announcements.slice(0, 5).map((a, i) => (
-                                <li
-                                    key={i}
-                                    className="border-b border-[#2b4b6f]/20 dark:border-[#7b3f00]/30 pb-2"
-                                >
-                                    <p className="font-medium text-[#2b4b6f]">{a.title}</p>
-                                    <p className="text-sm text-gray-500">{a.date}</p>
-                                </li>
-                            ))
-                        ) : (
-                            <p className="text-gray-400 text-center py-4">
-                                No announcements yet.
-                            </p>
-                        )}
-                    </ul>
-                </div>
-
-                <div className="mt-10 space-y-8">
-                    <TutorForm />
-                    <FoundForm />
-                    <ResearchForm />
-                </div>
+                {/* Your forms */}
+                <TutorForm />
+                <FoundForm />
+                <ResearchForm />
             </main>
         </div>
     );

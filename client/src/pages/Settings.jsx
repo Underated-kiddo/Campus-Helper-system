@@ -38,7 +38,6 @@ export default function Settings() {
     const [loading, setLoading] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
 
-    // Load settings and theme
     useEffect(() => {
         async function loadSettings() {
             try {
@@ -77,7 +76,6 @@ export default function Settings() {
         localStorage.setItem("theme", newTheme);
     };
 
-    // Profile picture handling
     const handleProfilePicChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -153,7 +151,6 @@ export default function Settings() {
         }
     }
 
-    // Change password
     async function handlePasswordChange(e) {
         e.preventDefault();
         const oldPassword = e.target.oldPassword.value;
@@ -180,7 +177,6 @@ export default function Settings() {
         }
     }
 
-    // Delete account
     async function handleDeleteAccount() {
         if (!confirm("Are you sure? This action is irreversible.")) return;
         try {
@@ -204,7 +200,6 @@ export default function Settings() {
             } flex justify-center items-start p-8`}
         >
             <div className="w-full max-w-3xl space-y-8">
-                {/* Theme Toggle */}
                 <div className="flex justify-end mb-4">
                     <Button
                         onClick={toggleTheme}
@@ -225,7 +220,6 @@ export default function Settings() {
                     </Button>
                 </div>
 
-                {/* Profile Section */}
                 <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
                     <div className="relative group">
                         <img
@@ -255,7 +249,6 @@ export default function Settings() {
                     </div>
                 </div>
 
-                {/* Account Settings */}
                 <Card className={`border ${darkMode ? "bg-[#2c2b29] border-[#3f3b38]" : "bg-white border-[#d4c4b0]"}`}>
                     <CardHeader>
                         <CardTitle className="text-[#2b4b6f] dark:text-[#d2b48c]">Account Settings</CardTitle>
@@ -359,7 +352,6 @@ export default function Settings() {
                     </CardContent>
                 </Card>
 
-                {/* Security Section */}
                 <Card
                     className={`border-t-4 ${darkMode
                         ? "bg-[#2c2b29] border-[#3f3b38] border-t-[#d2b48c]"

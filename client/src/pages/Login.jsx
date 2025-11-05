@@ -11,28 +11,51 @@ export default function Login() {
     const [form, setForm] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+    const handleChange = (e) =>
+        setForm({ ...form, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+
         try {
             const res = await API.post("/auth/login", form);
             const { token, user } = res.data;
 
+            if (!user || !user.name) {
+                throw new Error("Invalid user data received from server");
+            }
+
+            // ✅ Store user info + token for later dashboard use
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(user));
-            toast({ title: "Success", description: "Login successful!" });
 
-            const role = (user.role || "").toString().toLowerCase();
-            if (role === "admin") navigate("/admin/dashboard");
-            else if (role === "school") navigate("/school/dashboard");
-            else if (role === "student") navigate("/student/dashboard");
-            else navigate("/login");
+            toast({ title: "Success", description: `Welcome back, ${user.name}!` });
+
+            // ✅ Redirect based on role
+            const role = (user.role || "").toLowerCase();
+            switch (role) {
+                case "admin":
+                    navigate("/admin/dashboard");
+                    break;
+                case "school":
+                    navigate("/school/dashboard");
+                    break;
+                case "student":
+                    navigate("/student/dashboard");
+                    break;
+                default:
+                    toast({
+                        title: "Error",
+                        description: "Unknown user role — contact support",
+                        variant: "destructive",
+                    });
+                    navigate("/login");
+            }
         } catch (err) {
             toast({
                 title: "Error",
-                description: err.response?.data?.message || "Login failed",
+                description: err.response?.data?.message || err.message || "Login failed",
                 variant: "destructive",
             });
         } finally {

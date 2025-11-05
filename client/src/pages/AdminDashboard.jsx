@@ -1,51 +1,55 @@
-import React, { useState, useEffect } from "react";
-import {
-    BarChart3,
-    Users,
-    School,
-    Bell,
-    Settings,
-    Menu,
-    LogOut,
-    User,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "@/components/ui/toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun, Users, Building, LogIn, HelpCircle, Menu, User, LogOut, Settings } from "lucide-react";
+import API from "@/services/api";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import API from "../services/api";
-import { toast } from "@/components/ui/toast"; // fixed toast import
+import { BookAIcon } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 export default function AdminDashboard() {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
-    const [adminName, setAdminName] = useState("Brad");
-    const [stats, setStats] = useState({
-        students: 0,
-        schools: 0,
-        logins: 0,
-        tickets: 0,
-    });
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [stats, setStats] = useState({ students: 0, schools: 0, logins: 0, tickets: 0 });
     const [activities, setActivities] = useState([]);
-    const location = useLocation();
+    const [adminName, setAdminName] = useState("Admin");
+    const [adminProfilePic, setAdminProfilePic] = useState("");
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const toggleDarkMode = () => setDarkMode(!darkMode);
 
     useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            const parsed = JSON.parse(storedUser);
+            setAdminName(parsed.name || "Admin");
+            setAdminProfilePic(parsed.profilePic || "");
+        }
+
         const fetchData = async () => {
             try {
                 const res = await API.get("/admin/dashboard");
                 const data = res.data;
 
                 setStats({
-                    students: data.totalStudents,
-                    schools: data.totalSchools,
-                    logins: data.recentLogins,
-                    tickets: data.supportTickets,
+                    students: data.totalStudents || 0,
+                    schools: data.totalSchools || 0,
+                    logins: data.recentLogins || 0,
+                    tickets: data.recentTickets || 0,
                 });
-                setActivities(data.recentActivities);
-                setAdminName(data.adminName || " Brad");
+
+                setActivities(data.recentActivities || []);
+
+                if (data.adminName) setAdminName(data.adminName);
+                if (data.profilePic) setAdminProfilePic(data.profilePic);
             } catch (err) {
-                console.error("Error fetching dashboard data:", err);
-                toast.error(
-                    err.response?.data?.message || "Failed to load dashboard data"
-                );
+                toast({
+                    title: "Error",
+                    description: err.response?.data?.message || "Failed to load dashboard data",
+                    variant: "destructive",
+                });
             }
         };
 
@@ -54,182 +58,128 @@ export default function AdminDashboard() {
 
     const handleLogout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
         navigate("/login");
-        toast.success("Logged out successfully!");
+        toast({ title: "Logged out", description: "You have been logged out successfully." });
     };
 
     return (
-        <div
-            className={`flex min-h-screen transition-all duration-300 ${darkMode
-                ? "bg-gradient-to-br from-gray-900 via-gray-800 to-[#3b2f2f] text-gray-100"
-                : "bg-gradient-to-br from-blue-50 via-white to-[#e8dfd1] text-gray-900"
-                }`}
-        >
+        <div className={`flex min-h-screen transition-all duration-300 ${darkMode ? "bg-[#1a1a1a] text-white" : "bg-[#eaf1f8] text-gray-900"}`}>
+
+            {/* Sidebar */}
             <aside
-                className={`fixed top-0 left-0 h-screen shadow-2xl p-4 transition-all duration-300 ${darkMode
-                    ? "bg-[#2c2a29] border-r border-gray-700"
-                    : "bg-white border-r border-blue-100"
-                    } ${sidebarOpen ? "w-56" : "w-20"}`}
+                className={`fixed top-0 left-0 h-screen p-4 flex flex-col justify-between transition-all duration-300 ${darkMode ? "bg-[#2b4b6f] text-white" : "bg-[#2b4b6f] text-white"}`}
+                style={{ width: sidebarOpen ? "230px" : "80px" }}
             >
-                <div className="flex justify-between items-center mb-8">
-                    {sidebarOpen && (
-                        <h1 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 to-[#8b6b4c] bg-clip-text text-transparent">
-                            Campus Helper
-                        </h1>
-                    )}
-                    <button
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
-                        className="p-2 hover:bg-blue-100 dark:hover:bg-gray-700 rounded-lg"
-                    >
-                        <Menu />
-                    </button>
+                <div>
+                    <div className="flex justify-between items-center mb-10">
+                        {sidebarOpen && <h1 className="text-xl font-bold tracking-wide text-white">Campus Helper</h1>}
+                        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-white/20 transition">
+                            <Menu />
+                        </button>
+                    </div>
+
+                    <nav className="space-y-3">
+                        {[
+                            { icon: <BookOpen />, label: "Research ", path: "/Research" },
+                            { icon: <Users />, label: "Lost & Found", path: "/Lostnfound" },
+                            { icon: <Building />, label: "Announcements", path: "/Announcements" },
+                            { icon: <Settings />, label: "Settings", path: "/Settings" },
+                        ].map((item, i) => (
+                            <Link
+                                key={i}
+                                to={item.path}
+                                className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
+                                    location.pathname === item.path
+                                        ? "bg-[#1f3a5a] text-white border-l-4 border-[#d2b48c]"
+                                        : "hover:bg-[#1f3a5a]/50 text-white"
+                                }`}
+                            >
+                                {item.icon}
+                                {sidebarOpen && <span>{item.label}</span>}
+                            </Link>
+                        ))}
+                    </nav>
                 </div>
 
-                <nav className="space-y-3">
-                    {[
-                        { icon: <Users />, label: "Students", path: "/admin/students" },
-                        { icon: <School />, label: "Schools", path: "/admin/schools" },
-                        { icon: <Bell />, label: "Announcements", path: "/pages/Announcements" },
-                        { icon: <Settings />, label: "Settings", path: "/pages/Settings" },
-                    ].map((item, i) => (
-                        <Link
-                            key={i}
-                            to={item.path}
-                            className={`flex items-center gap-3 p-2 rounded-lg transition duration-150 font-medium ${location.pathname === item.path
-                                ? "bg-gradient-to-r from-blue-600 to-[#8b6b4c] text-white shadow-md"
-                                : "hover:bg-blue-100 dark:hover:bg-gray-700"
-                                }`}
-                        >
-                            {item.icon}
-                            {sidebarOpen && <span>{item.label}</span>}
-                        </Link>
-                    ))}
-                </nav>
+                <div className="mt-8 border-t border-white/20 pt-4">
+                    <div className="flex items-center gap-3 p-2 hover:bg-[#1f3a5a]/50 rounded-xl cursor-pointer">
+                        {sidebarOpen ? (
+                            <img
+                                src={adminProfilePic || "https://via.placeholder.com/40?text=A"}
+                                alt="Admin Avatar"
+                                className="h-10 w-10 rounded-full object-cover border-2 border-[#d2b48c]"
+                            />
+                        ) : (
+                            <User size={18} />
+                        )}
+                        {sidebarOpen && <span className="text-white">{adminName}</span>}
+                    </div>
+                    <div
+                        className="flex items-center gap-3 p-2 hover:bg-[#1f3a5a]/50 rounded-xl cursor-pointer mt-2"
+                        onClick={handleLogout}
+                    >
+                        <LogOut size={18} />
+                        {sidebarOpen && <span className="text-white">Logout</span>}
+                    </div>
+                </div>
             </aside>
 
-            <main
-                className={`flex-1 transition-all duration-300 p-6 ${sidebarOpen ? "ml-56" : "ml-20"
-                    }`}
-            >
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-[#8b6b4c] bg-clip-text text-transparent">
-                        Welcome, {adminName}
-                    </h2>
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => setDarkMode(!darkMode)}
-                            className="px-3 py-1 rounded-lg bg-gradient-to-r from-blue-600 to-[#8b6b4c] text-white hover:opacity-90 shadow-md"
-                        >
-                            {darkMode ? "☀️" : "🌙"}
-                        </button>
+            <main className={`flex-1 p-6 transition-all duration-300 ${sidebarOpen ? "ml-[230px]" : "ml-[80px]"}`}>
 
-                        <div className="relative group">
-                            <img
-                                src="/admin-avatar.png"
-                                alt="Admin Avatar"
-                                className="w-10 h-10 rounded-full cursor-pointer border-2 border-[#8b6b4c] hover:scale-105 transition-transform"
-                            />
-                            <div className="absolute hidden group-hover:block right-0 mt-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg w-36 z-50 border border-gray-200 dark:border-gray-700">
-                                <ul className="text-sm">
-                                    <li
-                                        className="p-2 hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center gap-2 cursor-pointer rounded-t-lg"
-                                        onClick={() => navigate("/admin/settings")}
-                                    >
-                                        <User size={16} /> Account
-                                    </li>
-                                    <li
-                                        className="p-2 hover:bg-red-100 dark:hover:bg-gray-700 flex items-center gap-2 cursor-pointer rounded-b-lg text-red-500"
-                                        onClick={handleLogout}
-                                    >
-                                        <LogOut size={16} /> Logout
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className={`text-2xl font-bold ${darkMode ? "text-white" : "text-[#2b4b6f]"}`}>Welcome, {adminName || "Admin"} 👋</h1>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className={`${darkMode ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]" : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"}`}
+                        onClick={toggleDarkMode}
+                    >
+                        {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                    </Button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                     {[
-                        { title: "Total Students", value: stats.students },
-                        { title: "Total Schools", value: stats.schools },
-                    ].map((card, i) => (
-                        <div
+                        { title: "Total Students", value: stats.students, icon: <Users className="h-5 w-5" /> },
+                        { title: "Total Schools", value: stats.schools, icon: <Building className="h-5 w-5" /> },
+                        { title: "Recent Logins", value: stats.logins, icon: <LogIn className="h-5 w-5" /> },
+                    ].map((stat, i) => (
+                        <Card
                             key={i}
-                            className={`rounded-2xl shadow-lg p-5 transform transition duration-200 hover:scale-[1.02] ${darkMode
-                                ? "bg-[#2f2b28] border border-gray-700"
-                                : "bg-gradient-to-br from-white to-blue-50 border border-blue-100"
-                                }`}
+                            className={`border rounded-2xl shadow-md transition-transform duration-300 hover:scale-[1.02] ${darkMode ? "bg-[#1f3a5a] border-[#d2b48c]" : "bg-white border-[#d2b48c]"}`}
                         >
-                            <h3 className="text-lg font-semibold mb-2 text-[#8b6b4c] dark:text-blue-400">
-                                {card.title}
-                            </h3>
-                            <p className="text-3xl font-bold text-blue-600 dark:text-[#d7b48c]">
-                                {card.value}
-                            </p>
-                        </div>
+                            <CardHeader>
+                                <CardTitle className={`flex items-center gap-2 ${darkMode ? "text-white" : "text-[#2b4b6f]"}`}>
+                                    {stat.icon} {stat.title}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className={`${darkMode ? "text-white" : "text-gray-900"} text-3xl font-semibold`}>{stat.value}</p>
+                            </CardContent>
+                        </Card>
                     ))}
                 </div>
 
-                <div
-                    className={`rounded-2xl shadow-lg p-6 mb-8 ${darkMode
-                        ? "bg-[#2f2b28]"
-                        : "bg-gradient-to-br from-white to-blue-50"
-                        }`}
+                <Card
+                    className={`border rounded-2xl shadow-md transition-transform duration-300 hover:scale-[1.02] ${darkMode ? "bg-[#1f3a5a] border-[#d2b48c]" : "bg-white border-[#d2b48c]"}`}
                 >
-                    <h3 className="text-lg font-semibold mb-4 text-[#8b6b4c] dark:text-blue-400">
-                        User Registrations Over Time
-                    </h3>
-                    <div className="h-40 flex items-center justify-center text-gray-400 italic">
-                        (Chart will render here)
-                    </div>
-                </div>
+                    <CardHeader>
+                        <CardTitle className={`${darkMode ? "text-white" : "text-[#2b4b6f]"}`}>Recent Activities</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {activities.length > 0 ? (
+                            <ul className={`${darkMode ? "text-white" : "text-gray-900"} list-disc pl-6 space-y-2`}>
+                                {activities.map((activity, index) => (
+                                    <li key={index}>{activity}</li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className={`${darkMode ? "text-white" : "text-gray-900"}`}>No recent activities found.</p>
+                        )}
+                    </CardContent>
+                </Card>
 
-                <div
-                    className={`rounded-2xl shadow-lg p-6 ${darkMode
-                        ? "bg-[#2f2b28]"
-                        : "bg-gradient-to-br from-white to-blue-50"
-                        }`}
-                >
-                    <h3 className="text-lg font-semibold mb-4 text-[#8b6b4c] dark:text-blue-400">
-                        Recent Activities
-                    </h3>
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="text-left border-b border-gray-300 dark:border-gray-700 text-blue-700 dark:text-[#d7b48c]">
-                                <th className="p-2">User</th>
-                                <th className="p-2">Action</th>
-                                <th className="p-2">Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {activities.length > 0 ? (
-                                activities.slice(0, 5).map((act, i) => (
-                                    <tr
-                                        key={i}
-                                        className="border-b border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition"
-                                    >
-                                        <td className="p-2">{act.user}</td>
-                                        <td className="p-2">{act.action}</td>
-                                        <td className="p-2">{act.time}</td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td
-                                        colSpan="3"
-                                        className="text-center py-4 text-gray-400 italic"
-                                    >
-                                        No recent activity found
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div className="space-y-3 mt-6">
-                </div>
             </main>
         </div>
     );
