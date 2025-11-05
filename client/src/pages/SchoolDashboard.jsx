@@ -72,9 +72,8 @@ export default function SchoolDashboard() {
                     <nav className="space-y-3">
                         {[
                             { icon: <Users />, label: "Students" },
-                            { icon: <Book />, label: "Announcements" },
-                            { icon: <BarChart3 />, label: "Reports" },
-                            { icon: <Settings />, label: "Settings" },
+                            { icon: <Building />, label: "Announcements", path: "/Announcements" },
+                            { icon: <Settings />, label: "Settings", path: "/Settings" },
                         ].map((item, i) => (
                             <div
                                 key={i}
@@ -117,7 +116,6 @@ export default function SchoolDashboard() {
                     </button>
                 </div>
 
-                {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
                     {[
                         { title: "Total Students", value: stats.students },

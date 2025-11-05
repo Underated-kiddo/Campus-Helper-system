@@ -28,14 +28,12 @@ export default function StudentDashboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Load student name from localStorage
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
             const parsed = JSON.parse(storedUser);
             setStudentName(parsed.name || "Student");
         }
 
-        // Fetch dashboard data
         const fetchDashboardData = async () => {
             try {
                 const res = await API.get("/student/dashboard");
@@ -77,7 +75,6 @@ export default function StudentDashboard() {
                     : "bg-gradient-to-br from-[#e3f0ff] via-white to-[#fdfaf7] text-gray-900"
                 }`}
         >
-            {/* Sidebar */}
             <aside
                 className={`fixed top-0 left-0 h-screen shadow-xl p-4 flex flex-col justify-between transition-all duration-300 ${darkMode
                         ? "bg-[#2c2a26]"
@@ -102,10 +99,10 @@ export default function StudentDashboard() {
 
                     <nav className="space-y-3">
                         {[
-                            { icon: <BookOpen />, label: "Research", path: "/pages/Research" },
-                            { icon: <Bell />, label: "Announcements", path: "/pages/Announcements" },
-                            { icon: <MessageSquare />, label: "Tutors", path: "/pages/Tutors" },
-                            { icon: <Settings />, label: "Settings", path: "/pages/Settings" },
+                            { icon: <BookOpen />, label: "Research", path: "/Research" },
+                            { icon: <Bell />, label: "Announcements", path: "/Announcements" },
+                            { icon: <MessageSquare />, label: "Tutors", path: "/Tutors" },
+                            { icon: <Settings />, label: "Settings", path: "/Settings" },
                         ].map((item, i) => (
                             <Link
                                 key={i}
@@ -137,7 +134,6 @@ export default function StudentDashboard() {
                 </div>
             </aside>
 
-            {/* Main Content */}
             <main
                 className={`flex-1 p-8 transition-all duration-300 ${sidebarOpen ? "ml-[230px]" : "ml-[80px]"
                     }`}
@@ -154,7 +150,6 @@ export default function StudentDashboard() {
                     </button>
                 </div>
 
-                {/* Your forms */}
                 <TutorForm />
                 <FoundForm />
                 <ResearchForm />

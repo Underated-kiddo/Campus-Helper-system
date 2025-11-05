@@ -66,7 +66,6 @@ export default function AdminDashboard() {
     return (
         <div className={`flex min-h-screen transition-all duration-300 ${darkMode ? "bg-[#1a1a1a] text-white" : "bg-[#eaf1f8] text-gray-900"}`}>
 
-            {/* Sidebar */}
             <aside
                 className={`fixed top-0 left-0 h-screen p-4 flex flex-col justify-between transition-all duration-300 ${darkMode ? "bg-[#2b4b6f] text-white" : "bg-[#2b4b6f] text-white"}`}
                 style={{ width: sidebarOpen ? "230px" : "80px" }}
