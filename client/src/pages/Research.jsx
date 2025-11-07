@@ -3,7 +3,7 @@ import API from "../services/api";
 import { Download, FileText } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 
-export default function ResearchMaterials() {
+export default function Research() {
     const [materials, setMaterials] = useState([]);
     const [flipped, setFlipped] = useState(null);
     const [view, setView] = useState("mine");
@@ -12,7 +12,7 @@ export default function ResearchMaterials() {
         const fetchMaterials = async () => {
             try {
                 const res = await API.get(
-                    view === "mine" ? "/research/mine" : "/research/all"
+                    view === "mine" ? "/resources" : "/resources"
                 );
                 setMaterials(res.data);
             } catch (err) {
@@ -32,7 +32,6 @@ export default function ResearchMaterials() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-[#d8c4a0] text-gray-900 transition-all duration-500">
-            {/* Top Navbar */}
             <header className="sticky top-0 z-20 flex items-center justify-between px-8 py-4 shadow-lg bg-gradient-to-r from-blue-700 to-[#8b5e3b] text-white">
                 <h1 className="text-2xl font-bold tracking-wide">
                     Research Materials
@@ -60,7 +59,6 @@ export default function ResearchMaterials() {
                 </nav>
             </header>
 
-            {/* Page Content */}
             <main className="p-10">
                 <h2 className="text-3xl font-bold text-blue-700 mb-8 text-center">
                     {view === "mine"
@@ -82,7 +80,6 @@ export default function ResearchMaterials() {
                                             : ""
                                         }`}
                                 >
-                                    {/* Front */}
                                     <div className="absolute inset-0 flex flex-col justify-center items-center rounded-2xl bg-gradient-to-br from-blue-100 to-[#f2e4d0] border border-blue-200 shadow-lg hover:shadow-2xl backdrop-blur-md transition-all duration-300">
                                         <FileText
                                             className="text-blue-700 mb-3 group-hover:scale-110 transition-transform"
@@ -96,7 +93,6 @@ export default function ResearchMaterials() {
                                         </p>
                                     </div>
 
-                                    {/* Back */}
                                     <div className="absolute inset-0 rotate-y-180 flex flex-col justify-center items-center rounded-2xl bg-gradient-to-br from-[#d7bfa0] via-white to-blue-100 border border-brown-300 shadow-lg backdrop-blur-md">
                                         <p className="text-sm font-medium text-gray-700 mb-1">
                                             Uploaded by:{" "}

@@ -81,11 +81,11 @@ export default function AdminDashboard() {
 
                     <nav className="space-y-3">
                         {[
-                            { icon: <BookOpen />, label: "Research ", path: "/api/research" },
-                            { icon: <Box />, label: "Lost & Found", path: "/api/lostnfound" },
-                            { icon: <Users />, label: "Tutors", path: "/api/tutors" },
-                            { icon: <Building />, label: "Announcements", path: "/api/announcements" },
-                            { icon: <Settings />, label: "Settings", path: "/api/settings" },
+                            { icon: <BookOpen />, label: "Research ", path: "/resources" },
+                            { icon: <Box />, label: "Lost & Found", path: "/lostnfound" },
+                            { icon: <Users />, label: "Tutors", path: "/tutors" },
+                            { icon: <Building />, label: "Announcements", path: "/announcements" },
+                            { icon: <Settings />, label: "Settings", path: "/settings" },
                         ].map((item, i) => (
                             <Link
                                 key={i}

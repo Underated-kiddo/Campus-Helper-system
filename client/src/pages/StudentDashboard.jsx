@@ -13,7 +13,7 @@ import FoundForm from "@/components/FoundForm";
 import ResearchForm from "@/components/ResearchForm";
 import API from "@/services/api";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { toast } from "@/components/ui/toast"; 
+import { toast } from "@/components/ui/toast";
 
 export default function StudentDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -24,6 +24,7 @@ export default function StudentDashboard() {
         performance: 0,
     });
     const [announcements, setAnnouncements] = useState([]);
+    const [loading, setLoading] = useState(true);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -36,6 +37,7 @@ export default function StudentDashboard() {
 
         const fetchDashboardData = async () => {
             try {
+                setLoading(true);
                 const res = await API.get("/student/dashboard");
                 const data = res.data;
 
@@ -52,6 +54,8 @@ export default function StudentDashboard() {
                         err.response?.data?.message || "Failed to load dashboard data",
                     variant: "destructive",
                 });
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -99,10 +103,10 @@ export default function StudentDashboard() {
 
                     <nav className="space-y-3">
                         {[
-                            { icon: <BookOpen />, label: "Research", path: "/api/research" },
-                            { icon: <Bell />, label: "Announcements", path: "/api/announcements" },
-                            { icon: <MessageSquare />, label: "Tutors", path: "/api/tutors" },
-                            { icon: <Settings />, label: "Settings", path: "/api/settings" },
+                            { icon: <BookOpen />, label: "Research", path: "/resources" },
+                            { icon: <Bell />, label: "Announcements", path: "/announcements" },
+                            { icon: <MessageSquare />, label: "Tutors", path: "/tutors" },
+                            { icon: <Settings />, label: "Settings", path: "/settings" },
                         ].map((item, i) => (
                             <Link
                                 key={i}
@@ -150,6 +154,86 @@ export default function StudentDashboard() {
                     </button>
                 </div>
 
+                {/* Dashboard Stats Section - ADDED THIS */}
+                {loading ? (
+                    <div className="flex justify-center items-center py-8">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2b4b6f]"></div>
+                    </div>
+                ) : (
+                    <>
+                        {/* Stats Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div className={`p-6 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"
+                                }`}>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className={`text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-600"
+                                            }`}>
+                                            New Announcements
+                                        </p>
+                                        <p className="text-2xl font-bold mt-2 text-[#2b4b6f] dark:text-[#7b9ecb]">
+                                            {stats.announcements}
+                                        </p>
+                                    </div>
+                                    <Bell className="text-[#2b4b6f] dark:text-[#7b9ecb]" />
+                                </div>
+                            </div>
+
+                            <div className={`p-6 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"
+                                }`}>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className={`text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-600"
+                                            }`}>
+                                            Performance
+                                        </p>
+                                        <p className="text-2xl font-bold mt-2 text-[#2b4b6f] dark:text-[#7b9ecb]">
+                                            {stats.performance}%
+                                        </p>
+                                    </div>
+                                    <BookOpen className="text-[#2b4b6f] dark:text-[#7b9ecb]" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Recent Announcements - ADDED THIS */}
+                        {announcements.length > 0 && (
+                            <div className={`mb-8 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"
+                                }`}>
+                                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                                    <h3 className="text-xl font-semibold text-[#2b4b6f] dark:text-[#7b9ecb]">
+                                        Recent Announcements
+                                    </h3>
+                                </div>
+                                <div className="p-6">
+                                    {announcements.map((announcement, index) => (
+                                        <div
+                                            key={index}
+                                            className={`p-4 rounded-lg mb-3 last:mb-0 ${darkMode ? "bg-[#1c1a17]" : "bg-gray-50"
+                                                }`}
+                                        >
+                                            <h4 className="font-semibold text-[#2b4b6f] dark:text-[#7b9ecb]">
+                                                {announcement.title}
+                                            </h4>
+                                            <p className={`mt-1 ${darkMode ? "text-gray-300" : "text-gray-600"
+                                                }`}>
+                                                {announcement.message}
+                                            </p>
+                                            {announcement.date && (
+                                                <p className={`text-xs mt-2 ${darkMode ? "text-gray-400" : "text-gray-500"
+                                                    }`}>
+                                                    {new Date(announcement.date).toLocaleDateString()}
+                                                </p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {/* Your existing forms */}
                 <TutorForm />
                 <FoundForm />
                 <ResearchForm />

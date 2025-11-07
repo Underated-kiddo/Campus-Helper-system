@@ -7,7 +7,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
-import Settings from "./pages/Settings";
+import Settings from "@/pages/Settings";
 import ResearchMaterials from "./pages/Research";
 import Announcements from "./pages/Announcements";
 import Lostnfound from "./pages/Lostnfound";
@@ -22,7 +22,6 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
-          {/* ✅ Role-based protected routes */}
           <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
           </Route>
@@ -36,29 +35,29 @@ export default function App() {
           </Route>
 
           <Route element={<ProtectedRoutes allowedRoles={["admin", "student"]} />}>
-            <Route path="/api/research" element={<ResearchMaterials />} />
+            <Route path="/resources" element={<ResearchMaterials />} />
           </Route>
 
           <Route
             element={<ProtectedRoutes allowedRoles={["admin", "student", "school"]} />}
           >
-            <Route path="/api/announcements" element={<Announcements />} />
+            <Route path="/announcements" element={<Announcements />} />
           </Route>
 
           <Route element={<ProtectedRoutes allowedRoles={["admin", "student"]} />}>
-            <Route path="/api/tutors" element={<Tutors />} />
+            <Route path="/tutors" element={<Tutors />} />
           </Route>
 
           <Route
             element={<ProtectedRoutes allowedRoles={["admin", "student", "school"]} />}
           >
-            <Route path="/api/lostnfound" element={<Lostnfound />} />
+            <Route path="/lostnfound" element={<Lostnfound />} />
           </Route>
 
           <Route
             element={<ProtectedRoutes allowedRoles={["admin", "student", "school"]} />}
           >
-            <Route path="/api/settings" element={<Settings />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
         </Routes>
       </BrowserRouter>

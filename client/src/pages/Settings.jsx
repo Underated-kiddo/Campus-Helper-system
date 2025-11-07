@@ -38,34 +38,35 @@ export default function Settings() {
     const [loading, setLoading] = useState(false);
     const [isDark, setIsDark] = useState(false);
 
-    // Sync theme globally
+    // Sync theme
     useEffect(() => {
         const updateTheme = () => {
             const theme = localStorage.getItem("theme") || "light";
             document.documentElement.classList.toggle("dark", theme === "dark");
             setIsDark(theme === "dark");
         };
-
-        updateTheme(); 
-        window.addEventListener("storage", updateTheme); 
+        updateTheme();
+        window.addEventListener("storage", updateTheme);
         return () => window.removeEventListener("storage", updateTheme);
     }, []);
 
     useEffect(() => {
         async function loadSettings() {
             try {
-                const res = await API.get("/user/settings/");
-                const data = res.data;
+                const res = await API.get("/settings");
+                const data = res.data.user || res.data;
                 setSettings({
                     name: data.name || "",
                     email: data.email || "",
-                    accountType: data.accountType || "student",
+                    accountType: data.role || "student",
                     bio: data.bio || "",
                     contact: data.contact || "",
                     notifications: data.notifications ?? true,
                     privateMode: data.privateMode ?? false,
                 });
-                setPreviewUrl(data.profilePic || "https://via.placeholder.com/120?text=Profile");
+                setPreviewUrl(
+                    data.profilePic || "https://via.placeholder.com/120?text=Profile"
+                );
             } catch {
                 toast({
                     title: "Error",
@@ -82,7 +83,7 @@ export default function Settings() {
         localStorage.setItem("theme", newTheme);
         document.documentElement.classList.toggle("dark", newTheme === "dark");
         setIsDark(!isDark);
-        window.dispatchEvent(new Event("storage")); // notify all pages
+        window.dispatchEvent(new Event("storage"));
     };
 
     const handleProfilePicChange = (e) => {
@@ -105,7 +106,7 @@ export default function Settings() {
         formData.append("profilePic", profilePic);
         setLoading(true);
         try {
-            await API.post("/user/upload_profile/", formData);
+            await API.post("/settings/profile/upload", formData);
             toast({
                 title: "Success",
                 description: "Profile picture updated!",
@@ -124,7 +125,7 @@ export default function Settings() {
     async function handleProfilePicRemove() {
         if (!confirm("Remove your profile picture?")) return;
         try {
-            await API.delete("/user/remove_profile_pic/");
+            await API.delete("/settings/profile/remove");
             setPreviewUrl("https://via.placeholder.com/120?text=Profile");
             toast({
                 title: "Removed",
@@ -143,7 +144,7 @@ export default function Settings() {
         e.preventDefault();
         setLoading(true);
         try {
-            await API.post("/user/settings/", settings);
+            await API.put("/settings", settings);
             toast({
                 title: "Saved",
                 description: "Settings updated successfully!",
@@ -165,7 +166,7 @@ export default function Settings() {
         const newPassword = e.target.newPassword.value;
         setLoading(true);
         try {
-            await API.post("/user/change_password/", {
+            await API.post("/settings/password/change", {
                 old_password: oldPassword,
                 new_password: newPassword,
             });
@@ -188,7 +189,7 @@ export default function Settings() {
     async function handleDeleteAccount() {
         if (!confirm("Are you sure? This action is irreversible.")) return;
         try {
-            await API.post("/user/delete_account/");
+            await API.delete("/settings/account/delete");
             toast({ title: "Account deleted." });
             window.location.href = "/login";
         } catch {
@@ -248,16 +249,33 @@ export default function Settings() {
                         </label>
                     </div>
                     <div>
+                        <button
+                            onClick={handleProfilePicRemove}
+                            className="absolute top-0 right-0 bg-red-600 text-white text-xs p-1 rounded-full hover:bg-red-700"
+                        >
+                            <Trash2 size={12} />
+                        </button>
+                    </div>
+                    <div>
                         <h2 className="text-xl font-semibold">{settings.name || "Your Name"}</h2>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                             {settings.email || "youremail@example.com"}
                         </p>
+                        <Button
+                            onClick={handleProfilePicUpload}
+                            disabled={loading}
+                            className="mt-2 text-xs bg-[#2b4b6f] text-white hover:bg-[#223b58]"
+                        >
+                            {loading ? "Uploading..." : "Save Picture"}
+                        </Button>
                     </div>
                 </div>
 
                 {/* Account Settings */}
                 <Card
-                    className={`border ${isDark ? "bg-[#2c2b29] border-[#3f3b38]" : "bg-white border-[#d4c4b0]"
+                    className={`border ${isDark
+                            ? "bg-[#2c2b29] border-[#3f3b38]"
+                            : "bg-white border-[#d4c4b0]"
                         }`}
                 >
                     <CardHeader>
@@ -380,6 +398,7 @@ export default function Settings() {
                     </CardContent>
                 </Card>
 
+                {/* Security */}
                 <Card
                     className={`border-t-4 ${isDark
                             ? "bg-[#2c2b29] border-[#3f3b38] border-t-[#d2b48c]"

@@ -7,7 +7,6 @@ const multer = require("multer");
 const User = require("../models/User");
 const { protect } = require("../middleware/auth");
 
-// ------------------- Multer setup for profile pic uploads -------------------
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadPath = path.join(__dirname, "../uploads/profile_pics");
@@ -20,7 +19,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ------------------- GET user settings -------------------
 router.get("/settings", protect, async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select("-password");
@@ -31,7 +29,6 @@ router.get("/settings", protect, async (req, res) => {
     }
 });
 
-// ------------------- UPDATE user settings -------------------
 router.post("/settings", protect, async (req, res) => {
     try {
         const allowedFields = [
@@ -60,7 +57,6 @@ router.post("/settings", protect, async (req, res) => {
     }
 });
 
-// ------------------- UPLOAD profile picture -------------------
 router.post("/upload_profile", protect, upload.single("profilePic"), async (req, res) => {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
@@ -74,7 +70,6 @@ router.post("/upload_profile", protect, upload.single("profilePic"), async (req,
     }
 });
 
-// ------------------- REMOVE profile picture -------------------
 router.delete("/remove_profile_pic", protect, async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
@@ -94,7 +89,6 @@ router.delete("/remove_profile_pic", protect, async (req, res) => {
     }
 });
 
-// ------------------- CHANGE password -------------------
 router.post("/change_password", protect, async (req, res) => {
     try {
         const { old_password, new_password } = req.body;
@@ -115,13 +109,11 @@ router.post("/change_password", protect, async (req, res) => {
     }
 });
 
-// ------------------- DELETE account -------------------
 router.post("/delete_account", protect, async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        // delete profile picture if exists
         if (user.profilePic) {
             const filePath = path.join(__dirname, "..", user.profilePic);
             if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
@@ -135,4 +127,3 @@ router.post("/delete_account", protect, async (req, res) => {
 });
 
 module.exports = router;
- 

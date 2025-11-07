@@ -72,8 +72,8 @@ export default function SchoolDashboard() {
                     <nav className="space-y-3">
                         {[
                             { icon: <Users />, label: "Students" },
-                            { icon: <Building />, label: "Announcements", path: "/api/announcements" },
-                            { icon: <Settings />, label: "Settings", path: "/api/settings" },
+                            { icon: <Building />, label: "Announcements", path: "/announcements" },
+                            { icon: <Settings />, label: "Settings", path: "/settings" },
                         ].map((item, i) => (
                             <div
                                 key={i}
