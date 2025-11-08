@@ -4,6 +4,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const {
+    getSettings,
     updateSettings,
     changePassword,
     deleteAccount,
@@ -35,20 +36,22 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 
+// ✅ Fetch user settings (GET /api/settings)
+router.get("/", protect, getSettings);
 
-// Update general user settings (name, bio, contact, etc.)
+// Update general user settings (name, bio, contact, etc.) - PUT /api/settings
 router.put("/", protect, updateSettings);
 
-// Upload or replace profile picture
+// Upload or replace profile picture - POST /api/settings/profile/upload
 router.post("/profile/upload", protect, upload.single("profilePic"), uploadProfilePic);
 
-// Remove current profile picture
+// Remove current profile picture - DELETE /api/settings/profile/remove
 router.delete("/profile/remove", protect, removeProfilePic);
 
-// Change user password
+// Change user password - POST /api/settings/password/change
 router.post("/password/change", protect, changePassword);
 
-// Delete user account
+// Delete user account - DELETE /api/settings/account/delete
 router.delete("/account/delete", protect, deleteAccount);
 
 module.exports = router;

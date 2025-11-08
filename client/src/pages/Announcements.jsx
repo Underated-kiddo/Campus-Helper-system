@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,6 @@ export default function Announcements() {
     const [announcements, setAnnouncements] = useState([]);
     const [newAnnouncement, setNewAnnouncement] = useState({ title: "", message: "" });
     const [userRole, setUserRole] = useState(null);
-    // const navigate = useNavigate();
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -72,7 +70,7 @@ export default function Announcements() {
                 Campus Announcements
             </h1>
 
-            {userRole === "admin" && (
+            {(userRole === "admin" || userRole === "school") && (
                 <Card className="w-full max-w-2xl mb-10 shadow-2xl border border-blue-100 dark:border-gray-700 bg-white/90 dark:bg-[#2f2b28]/90 backdrop-blur-sm transition-all hover:scale-[1.01]">
                     <CardHeader className="border-b border-blue-100 dark:border-gray-700">
                         <CardTitle className="text-xl font-semibold text-center text-blue-700 dark:text-[#d7b48c]">

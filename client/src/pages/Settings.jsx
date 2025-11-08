@@ -7,6 +7,7 @@ import {
     CardTitle,
     CardDescription,
     CardContent,
+    CardFooter,
 } from "@/components/ui/card";
 import {
     Select,
@@ -50,22 +51,29 @@ export default function Settings() {
         return () => window.removeEventListener("storage", updateTheme);
     }, []);
 
+    // Load settings from backend and persist local bio/profilePic
     useEffect(() => {
         async function loadSettings() {
             try {
                 const res = await API.get("/settings");
                 const data = res.data.user || res.data;
+
+                // Load locally stored bio and profilePic first
+                const storedPic = localStorage.getItem("profilePic");
+                const storedBio = localStorage.getItem("userBio");
+
                 setSettings({
                     name: data.name || "",
                     email: data.email || "",
                     accountType: data.role || "student",
-                    bio: data.bio || "",
+                    bio: storedBio || data.bio || "",
                     contact: data.contact || "",
                     notifications: data.notifications ?? true,
                     privateMode: data.privateMode ?? false,
                 });
+
                 setPreviewUrl(
-                    data.profilePic || "https://via.placeholder.com/120?text=Profile"
+                    storedPic || data.profilePic || "https://via.placeholder.com/120?text=Profile"
                 );
             } catch {
                 toast({
@@ -77,6 +85,18 @@ export default function Settings() {
         }
         loadSettings();
     }, []);
+
+    // Persist bio locally whenever it changes
+    useEffect(() => {
+        if (settings.bio !== undefined) {
+            localStorage.setItem("userBio", settings.bio);
+        }
+    }, [settings.bio]);
+
+    // Persist profile picture locally whenever it changes
+    useEffect(() => {
+        if (previewUrl) localStorage.setItem("profilePic", previewUrl);
+    }, [previewUrl]);
 
     const toggleTheme = () => {
         const newTheme = isDark ? "light" : "dark";
@@ -90,7 +110,9 @@ export default function Settings() {
         const file = e.target.files[0];
         if (file) {
             setProfilePic(file);
-            setPreviewUrl(URL.createObjectURL(file));
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url); // instant preview
+            localStorage.setItem("profilePic", url); // persist locally
         }
     };
 
@@ -126,7 +148,10 @@ export default function Settings() {
         if (!confirm("Remove your profile picture?")) return;
         try {
             await API.delete("/settings/profile/remove");
-            setPreviewUrl("https://via.placeholder.com/120?text=Profile");
+            const placeholder = "https://via.placeholder.com/120?text=Profile";
+            setPreviewUrl(placeholder);
+            setProfilePic(null);
+            localStorage.removeItem("profilePic");
             toast({
                 title: "Removed",
                 description: "Profile picture removed.",
@@ -207,12 +232,13 @@ export default function Settings() {
                 } flex justify-center items-start p-8`}
         >
             <div className="w-full max-w-3xl space-y-8">
+                {/* Theme Toggle */}
                 <div className="flex justify-end mb-4">
                     <Button
                         onClick={toggleTheme}
                         className={`flex items-center gap-2 px-4 py-2 rounded-md ${isDark
-                                ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
-                                : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
+                            ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
+                            : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
                             }`}
                     >
                         {isDark ? (
@@ -227,10 +253,11 @@ export default function Settings() {
                     </Button>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
+                {/* Profile */}
+                <div className="flex flex-col sm:flex-row items-center gap-6 mb-8 relative">
                     <div className="relative group">
                         <img
-                            src={previewUrl}
+                            src={previewUrl || "https://via.placeholder.com/120?text=Profile"}
                             alt="Profile"
                             className="w-28 h-28 rounded-full object-cover border-4 border-[#2b4b6f] dark:border-[#d2b48c]"
                         />
@@ -248,6 +275,7 @@ export default function Settings() {
                             />
                         </label>
                     </div>
+
                     <div>
                         <button
                             onClick={handleProfilePicRemove}
@@ -256,6 +284,7 @@ export default function Settings() {
                             <Trash2 size={12} />
                         </button>
                     </div>
+
                     <div>
                         <h2 className="text-xl font-semibold">{settings.name || "Your Name"}</h2>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -274,8 +303,8 @@ export default function Settings() {
                 {/* Account Settings */}
                 <Card
                     className={`border ${isDark
-                            ? "bg-[#2c2b29] border-[#3f3b38]"
-                            : "bg-white border-[#d4c4b0]"
+                        ? "bg-[#2c2b29] border-[#3f3b38]"
+                        : "bg-white border-[#d4c4b0]"
                         }`}
                 >
                     <CardHeader>
@@ -387,8 +416,8 @@ export default function Settings() {
                             <Button
                                 type="submit"
                                 className={`w-full ${isDark
-                                        ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
-                                        : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
+                                    ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
+                                    : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
                                     }`}
                                 disabled={loading}
                             >
@@ -401,8 +430,8 @@ export default function Settings() {
                 {/* Security */}
                 <Card
                     className={`border-t-4 ${isDark
-                            ? "bg-[#2c2b29] border-[#3f3b38] border-t-[#d2b48c]"
-                            : "bg-white border-[#d4c4b0] border-t-[#2b4b6f]"
+                        ? "bg-[#2c2b29] border-[#3f3b38] border-t-[#d2b48c]"
+                        : "bg-white border-[#d4c4b0] border-t-[#2b4b6f]"
                         }`}
                 >
                     <CardHeader>
@@ -429,8 +458,8 @@ export default function Settings() {
                             <Button
                                 type="submit"
                                 className={`w-full ${isDark
-                                        ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
-                                        : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
+                                    ? "bg-[#d2b48c] text-black hover:bg-[#c3a678]"
+                                    : "bg-[#2b4b6f] text-white hover:bg-[#223b58]"
                                     }`}
                                 disabled={loading}
                             >

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     BookOpen,
     Bell,
@@ -24,7 +24,7 @@ export default function StudentDashboard() {
         performance: 0,
     });
     const [announcements, setAnnouncements] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -51,7 +51,8 @@ export default function StudentDashboard() {
                 toast({
                     title: "Error",
                     description:
-                        err.response?.data?.message || "Failed to load dashboard data",
+                        err.response?.data?.message ||
+                        "Failed to load dashboard data",
                     variant: "destructive",
                 });
             } finally {
@@ -79,6 +80,7 @@ export default function StudentDashboard() {
                     : "bg-gradient-to-br from-[#e3f0ff] via-white to-[#fdfaf7] text-gray-900"
                 }`}
         >
+            {/* Sidebar */}
             <aside
                 className={`fixed top-0 left-0 h-screen shadow-xl p-4 flex flex-col justify-between transition-all duration-300 ${darkMode
                         ? "bg-[#2c2a26]"
@@ -138,6 +140,7 @@ export default function StudentDashboard() {
                 </div>
             </aside>
 
+            {/* Main Content */}
             <main
                 className={`flex-1 p-8 transition-all duration-300 ${sidebarOpen ? "ml-[230px]" : "ml-[80px]"
                     }`}
@@ -154,21 +157,24 @@ export default function StudentDashboard() {
                     </button>
                 </div>
 
-                {/* Dashboard Stats Section - ADDED THIS */}
                 {loading ? (
                     <div className="flex justify-center items-center py-8">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2b4b6f]"></div>
                     </div>
                 ) : (
                     <>
-                        {/* Stats Cards */}
+                        {/* Stats */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                            <div className={`p-6 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"
-                                }`}>
+                            <div
+                                className={`p-6 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"
+                                    }`}
+                            >
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className={`text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-600"
-                                            }`}>
+                                        <p
+                                            className={`text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-600"
+                                                }`}
+                                        >
                                             New Announcements
                                         </p>
                                         <p className="text-2xl font-bold mt-2 text-[#2b4b6f] dark:text-[#7b9ecb]">
@@ -179,12 +185,16 @@ export default function StudentDashboard() {
                                 </div>
                             </div>
 
-                            <div className={`p-6 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"
-                                }`}>
+                            <div
+                                className={`p-6 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"
+                                    }`}
+                            >
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className={`text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-600"
-                                            }`}>
+                                        <p
+                                            className={`text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-600"
+                                                }`}
+                                        >
                                             Performance
                                         </p>
                                         <p className="text-2xl font-bold mt-2 text-[#2b4b6f] dark:text-[#7b9ecb]">
@@ -196,10 +206,12 @@ export default function StudentDashboard() {
                             </div>
                         </div>
 
-                        {/* Recent Announcements - ADDED THIS */}
+                        {/* Announcements */}
                         {announcements.length > 0 && (
-                            <div className={`mb-8 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"
-                                }`}>
+                            <div
+                                className={`mb-8 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"
+                                    }`}
+                            >
                                 <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                                     <h3 className="text-xl font-semibold text-[#2b4b6f] dark:text-[#7b9ecb]">
                                         Recent Announcements
@@ -215,14 +227,24 @@ export default function StudentDashboard() {
                                             <h4 className="font-semibold text-[#2b4b6f] dark:text-[#7b9ecb]">
                                                 {announcement.title}
                                             </h4>
-                                            <p className={`mt-1 ${darkMode ? "text-gray-300" : "text-gray-600"
-                                                }`}>
+                                            <p
+                                                className={`mt-1 ${darkMode
+                                                        ? "text-gray-300"
+                                                        : "text-gray-600"
+                                                    }`}
+                                            >
                                                 {announcement.message}
                                             </p>
                                             {announcement.date && (
-                                                <p className={`text-xs mt-2 ${darkMode ? "text-gray-400" : "text-gray-500"
-                                                    }`}>
-                                                    {new Date(announcement.date).toLocaleDateString()}
+                                                <p
+                                                    className={`text-xs mt-2 ${darkMode
+                                                            ? "text-gray-400"
+                                                            : "text-gray-500"
+                                                        }`}
+                                                >
+                                                    {new Date(
+                                                        announcement.date
+                                                    ).toLocaleDateString()}
                                                 </p>
                                             )}
                                         </div>
@@ -233,7 +255,6 @@ export default function StudentDashboard() {
                     </>
                 )}
 
-                {/* Your existing forms */}
                 <TutorForm />
                 <FoundForm />
                 <ResearchForm />

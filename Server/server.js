@@ -1,9 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const connectDB = require("./config/db");
-const adminRoutes = require("./routes/adminRoutes");
-
 
 const app = express();
 connectDB();
@@ -14,7 +13,7 @@ const corsOptions = {
 	credentials: true,
 	allowedHeaders: ["Content-Type", "Authorization"],
 };
-app.use(cors(corsOptions)); 
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
@@ -24,10 +23,12 @@ app.use("/api/resources", require("./routes/resourceRoutes"));
 app.use("/api/tutors", require("./routes/tutorRoutes"));
 app.use("/api/settings", require("./routes/settingsRoutes"));
 app.use("/api/announcements", require("./routes/announcementRoutes"));
-app.use("/api/admin", adminRoutes); 
+app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/school", require("./routes/schoolRoutes"));
+app.use("/api/student", require("./routes/studentRoutes"));
 
-// Serve static files (like uploaded images) 
-app.use("/uploads", express.static("uploads"));
+// Serve static files (like uploaded images)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Server
 const PORT = process.env.PORT || 5000;

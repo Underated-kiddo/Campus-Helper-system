@@ -1,22 +1,35 @@
+// routes/authRoutes.js
 const express = require('express');
-const { signup, login } = require("../controllers/authController");
-const { protect } = require("../middleware/auth");
-const User = require("../models/User");
 const router = express.Router();
+const { signup, login } = require('../controllers/authController');
+const { protect } = require('../middleware/auth');
+const User = require('../models/User');
 
+// ✅ Signup route
 router.post('/signup', signup);
+
+// ✅ Login route
 router.post('/login', login);
 
-// profile endpoint used by frontend to verify token and get user info
+// ✅ Profile route - verifies JWT and returns user info
+// This will be accessible via /api/auth/profile in your server.js
 router.get('/profile', protect, async (req, res) => {
 	try {
-		// req.user is the decoded token payload ({ id, role })
+		// req.user is set by protect middleware (decoded JWT payload)
 		const user = await User.findById(req.user.id).select('-password');
-		if (!user) return res.status(404).json({ message: 'User not found' });
-		res.json({ id: user._id, email: user.email, role: user.role });
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' });
+		}
+
+		// ✅ Return only what ProtectedRoutes needs
+		return res.status(200).json({
+			id: user._id,
+			email: user.email,
+			role: user.role, // 👈 EXACTLY what your ProtectedRoutes expects
+		});
 	} catch (error) {
-		console.error('Profile error:', error);
-		res.status(500).json({ message: error.message });
+		console.error('Profile route error:', error);
+		return res.status(500).json({ message: 'Server error fetching profile' });
 	}
 });
 

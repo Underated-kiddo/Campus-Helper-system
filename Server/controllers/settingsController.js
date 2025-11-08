@@ -21,7 +21,6 @@ exports.updateSettings = async (req, res) => {
         const allowedFields = [
             "name",
             "email",
-            "role",
             "bio",
             "contact",
             "notifications",
@@ -47,7 +46,7 @@ exports.updateSettings = async (req, res) => {
     }
 };
 
-// ✅ POST /api/settings/upload-profile - Upload profile picture
+// ✅ POST /api/settings/profile/upload - Upload profile picture
 exports.uploadProfilePic = async (req, res) => {
     try {
         if (!req.file)
@@ -73,7 +72,7 @@ exports.uploadProfilePic = async (req, res) => {
     }
 };
 
-// ✅ DELETE /api/settings/remove-profile - Remove profile picture
+// ✅ DELETE /api/settings/profile/remove - Remove profile picture
 exports.removeProfilePic = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
@@ -93,7 +92,7 @@ exports.removeProfilePic = async (req, res) => {
     }
 };
 
-// ✅ PUT /api/settings/change-password - Change password
+// ✅ POST /api/settings/password/change - Change password
 exports.changePassword = async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body;
@@ -115,7 +114,7 @@ exports.changePassword = async (req, res) => {
     }
 };
 
-// ✅ DELETE /api/settings/delete-account - Delete user account
+// ✅ DELETE /api/settings/account/delete - Delete user account
 exports.deleteAccount = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);

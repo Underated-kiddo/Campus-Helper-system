@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun, Users, Building, LogIn, HelpCircle, Menu, User, LogOut, Settings } from "lucide-react";
 import API from "@/services/api";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BookAIcon } from "lucide-react";
 import { BookOpen } from "lucide-react";
 import { Box } from "lucide-react";
 
