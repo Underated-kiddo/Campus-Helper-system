@@ -1,38 +1,54 @@
 const Resource = require("../models/resources");
+const path = require("path");
+const fs = require("fs");
 
-// Upload a new file
+// UPLOAD RESOURCE
 exports.uploadResource = async (req, res) => {
     try {
+        const { name, unit, description, author } = req.body;
+
         if (!req.file) {
             return res.status(400).json({ message: "No file uploaded." });
         }
 
-        const { title, description } = req.body;
+        // Extract file details
         const fileUrl = `/uploads/resources/${req.file.filename}`;
+        const fileName = req.file.originalname;
+        const fileType = req.file.mimetype;
+        const fileSize = req.file.size;
 
-        const resource = new Resource({
-            title,
+        // Create new resource entry
+        const newResource = await Resource.create({
+            name,
+            unit,
             description,
+            author,
             fileUrl,
-            uploadedBy: req.user._id,
-            fileType: req.file.mimetype,
+            fileName,
+            fileType,
+            fileSize,
         });
 
-        await resource.save();
-        res.status(201).json({ message: "File uploaded successfully.", resource });
+        res.status(201).json({
+            message: "Resource uploaded successfully",
+            resource: newResource,
+        });
     } catch (error) {
-        console.error("Error uploading file:", error);
-        res.status(500).json({ message: "Server error while uploading file." });
+        console.error("Upload Error:", error);
+        res.status(500).json({ message: "Upload failed", error: error.message });
     }
 };
 
-// Get all uploaded resources
+// GET ALL RESOURCES
 exports.getResources = async (req, res) => {
     try {
-        const resources = await Resource.find().populate("uploadedBy", "name email");
-        res.status(200).json(resources);
+        const resources = await Resource.find().sort({ createdAt: -1 });
+        res.json(resources);
     } catch (error) {
-        console.error("Error fetching resources:", error);
-        res.status(500).json({ message: "Server error while fetching resources." });
+        console.error("Fetch Error:", error);
+        res.status(500).json({
+            message: "Failed to fetch resources",
+            error: error.message,
+        });
     }
 };

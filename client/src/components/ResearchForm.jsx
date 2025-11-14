@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-export default function ResearchUploadForm() {
+export default function ResearchForm() {
     const [formData, setFormData] = useState({
         name: "",
         unit: "",
@@ -13,7 +13,7 @@ export default function ResearchUploadForm() {
         file: null,
     });
 
-    const [preview, setPreview] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,29 +21,60 @@ export default function ResearchUploadForm() {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            setFormData({ ...formData, file });
-            if (file.type.startsWith("image/")) {
-                setPreview(URL.createObjectURL(file));
-            } else {
-                setPreview(file.name);
-            }
+        if (!file) return;
+
+        // Only allow PDF, Word, PPT, ZIP, RAR
+        const allowedTypes = [
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/zip",
+            "application/x-rar-compressed"
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            alert("Unsupported file type. Only PDF, Word, PPT, ZIP, RAR allowed.");
+            e.target.value = null;
+            return;
         }
+
+        if (file.size > 30 * 1024 * 1024) {
+            alert("File is too big! Max size is 30MB.");
+            e.target.value = null;
+            return;
+        }
+
+        setFormData({ ...formData, file });
+    };
+
+    const handleRemoveFile = () => {
+        setFormData({ ...formData, file: null });
+        document.getElementById("file-upload").value = null;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!formData.file) return alert("Please select a file before submitting!");
+
+        setLoading(true);
+
         try {
             const data = new FormData();
-            for (const key in formData) {
-                data.append(key, formData[key]);
-            }
+            data.append("name", formData.name);
+            data.append("unit", formData.unit);
+            data.append("description", formData.description);
+            data.append("author", formData.author);
+            data.append("file", formData.file);
 
-            await API.post("/researchmaterials", data, {
+            await API.post("/resources/upload", data, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
             alert("Research material submitted successfully!");
+
             setFormData({
                 name: "",
                 unit: "",
@@ -51,10 +82,13 @@ export default function ResearchUploadForm() {
                 author: "",
                 file: null,
             });
-            setPreview(null);
+
+            document.getElementById("file-upload").value = null;
         } catch (err) {
             console.error("Failed to submit material:", err);
-            alert("Error submitting research material");
+            alert(err.response?.data?.message || "Error submitting research material");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -65,15 +99,12 @@ export default function ResearchUploadForm() {
                 className="w-full max-w-lg bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-blue-100 p-8 hover:shadow-2xl transition-all duration-300"
             >
                 <h2 className="text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-amber-600">
-                    📘 Upload Research Material
+                    Upload Research Material📚
                 </h2>
 
                 <div className="space-y-4">
-                    {/* Topic Name */}
                     <div>
-                        <label className="block text-sm font-semibold text-blue-800 mb-1">
-                            Topic Name
-                        </label>
+                        <label className="block text-sm font-semibold text-blue-800 mb-1">Topic Name</label>
                         <Input
                             type="text"
                             name="name"
@@ -85,11 +116,8 @@ export default function ResearchUploadForm() {
                         />
                     </div>
 
-                    {/* Unit */}
                     <div>
-                        <label className="block text-sm font-semibold text-blue-800 mb-1">
-                            Unit Name
-                        </label>
+                        <label className="block text-sm font-semibold text-blue-800 mb-1">Unit Name</label>
                         <Input
                             type="text"
                             name="unit"
@@ -101,11 +129,8 @@ export default function ResearchUploadForm() {
                         />
                     </div>
 
-                    {/* Description */}
                     <div>
-                        <label className="block text-sm font-semibold text-blue-800 mb-1">
-                            Description
-                        </label>
+                        <label className="block text-sm font-semibold text-blue-800 mb-1">Description</label>
                         <Textarea
                             name="description"
                             value={formData.description}
@@ -116,11 +141,8 @@ export default function ResearchUploadForm() {
                         />
                     </div>
 
-                    {/* Author */}
                     <div>
-                        <label className="block text-sm font-semibold text-blue-800 mb-1">
-                            Author
-                        </label>
+                        <label className="block text-sm font-semibold text-blue-800 mb-1">Author</label>
                         <Input
                             type="text"
                             name="author"
@@ -132,54 +154,53 @@ export default function ResearchUploadForm() {
                         />
                     </div>
 
-                    {/* File Upload */}
                     <div>
-                        <label className="block text-sm font-semibold text-blue-800 mb-1">
-                            Upload File
-                        </label>
-                        <div className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-4 bg-blue-50 hover:bg-blue-100 transition cursor-pointer">
+                        <label className="block text-sm font-semibold text-blue-800 mb-1">Upload File</label>
+                        <div
+                            onClick={() => document.getElementById("file-upload").click()}
+                            className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-6 bg-blue-50 hover:bg-blue-100 cursor-pointer"
+                        >
                             <input
                                 type="file"
                                 name="file"
-                                accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg"
+                                accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.rar"
                                 onChange={handleFileChange}
                                 className="hidden"
                                 id="file-upload"
-                                required
                             />
-                            <label
-                                htmlFor="file-upload"
-                                className="text-blue-700 font-medium cursor-pointer hover:underline"
-                            >
-                                Click to upload a file
-                            </label>
+                            <p className="text-blue-700 font-medium hover:underline">
+                                {formData.file
+                                    ? formData.file.name
+                                    : "Click here to select a file (PDF, Word, PPT, ZIP/RAR)"}
+                            </p>
 
-                            {preview && (
-                                <div className="mt-3 text-center">
-                                    {preview.startsWith("blob:") ? (
-                                        <img
-                                            src={preview}
-                                            alt="Preview"
-                                            className="w-40 h-40 object-cover rounded-xl shadow-md border border-blue-100 mx-auto"
-                                        />
-                                    ) : (
-                                        <p className="text-blue-800 text-sm font-medium">
-                                            {preview}
-                                        </p>
-                                    )}
+                            {formData.file && (
+                                <div className="text-sm text-blue-600 mt-1 text-center">
+                                    Size: {(formData.file.size / 1024 / 1024).toFixed(2)} MB<br />
+                                    Type: {formData.file.type || "Unknown"}
                                 </div>
                             )}
                         </div>
-                    </div>
-                </div>
 
-                {/* Submit */}
-                <Button
-                    type="submit"
-                    className="w-full mt-6 bg-gradient-to-r from-blue-700 to-amber-600 hover:opacity-90 text-white font-semibold py-2 rounded-xl transition-all duration-200"
-                >
-                    Submit
-                </Button>
+                        {formData.file && (
+                            <button
+                                type="button"
+                                onClick={handleRemoveFile}
+                                className="mt-2 text-red-600 hover:underline text-sm"
+                            >
+                                Remove file
+                            </button>
+                        )}
+                    </div>
+
+                    <Button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full mt-6 bg-gradient-to-r from-blue-700 to-amber-600 hover:opacity-90 text-white font-semibold py-2 rounded-xl transition-all duration-200 disabled:opacity-50"
+                    >
+                        {loading ? "Uploading..." : "Submit"}
+                    </Button>
+                </div>
             </form>
         </div>
     );
