@@ -1,8 +1,22 @@
 const express = require("express");
-const router = express.Router();
-const upload = require("../middleware/upload");
-const { createItem } = require("../controllers/lostnfoundController");
+const multer = require("multer");
+const path = require("path");
+const { addLostItem, getLostItems } = require("../controllers/lostnfoundController");
 
-router.post("/", upload.single("picture"), createItem);
+const router = express.Router();
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "uploads/");
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    },
+});
+
+const upload = multer({ storage });
+
+router.post("/", upload.single("uploaded_image"), addLostItem);
+router.get("/", getLostItems);
 
 module.exports = router;

@@ -1,10 +1,35 @@
 const mongoose = require("mongoose");
 
-const lostnfoundSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    contact: { type: String },
-    picture: { type: String } // path or URL of uploaded image
-});
+const lostnfoundSchema = new mongoose.Schema(
+    {
+        Full_name: {
+            name: {
+                type: String,
+                required: [true, "Finder's name is required"],
+                trim: true,
+            },
+            phone_number: {
+                type: String,
+                required: [true, "Phone number is required"],
+                trim: true,
+            },
+        },
+        item_found: {
+            type: String,
+            required: [true, "Item name is required"],
+            trim: true,
+        },
+        item_description: {
+            type: String,
+            required: [true, "Item description is required"],
+            trim: true,
+        },
+        upload_image: {
+            type: String, // Path or URL to image
+            default: null,
+                },
+    },
+    { timestamps: true }
+);
 
-module.exports = mongoose.model("LostNFound", lostnfoundSchema);
+module.exports = mongoose.model("Lostnfound", lostnfoundSchema);

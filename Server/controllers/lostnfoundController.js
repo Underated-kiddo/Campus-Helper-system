@@ -1,56 +1,38 @@
-const LostNFound = require("../models/Lostnfound");
+const Lostnfound = require("../models/Lostnfound");
 
-exports.createItem = async (req, res) => {
+// Add new lost item
+exports.addLostItem = async (req, res) => {
     try {
-        const { name, description, contact } = req.body;
-        let picture = null;
+        const { name, item_found, item_description, phone_number } = req.body;
+        const upload_image = req.file ? req.file.path : null;
 
-        if (req.file) {
-            picture = `/uploads/${req.file.filename}`;
-        } else if (req.body.picture) {
-            picture = req.body.picture;
+        if (!name || !item_found || !item_description || !phone_number ) {
+            return res.status(400).json({ message: "All necessary fields  are required" });
         }
 
-        const newItem = new LostNFound({
-            name,
-            description,
-            contact,
-            picture,
+        const newItem = new Lostnfound({
+            Full_name: {
+                name,
+                phone_number,
+            },
+            item_found,
+            item_description,
+            upload_image,
         });
 
         await newItem.save();
-        res.status(201).json({ message: "Item added successfully", newItem });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error adding item", error });
+        res.status(201).json({ message: "Lost item Posted successfully", data: newItem });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };
 
-exports.getAllItems = async (req, res) => {
+// Get all lost items
+exports.getLostItems = async (req, res) => {
     try {
-        const items = await LostNFound.find();
+        const items = await Lostnfound.find().sort({ createdAt: -1 });
         res.status(200).json(items);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching items", error });
-    }
-};
-
-exports.getItemById = async (req, res) => {
-    try {
-        const item = await LostNFound.findById(req.params.id);
-        if (!item) return res.status(404).json({ message: "Item not found" });
-        res.status(200).json(item);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching item", error });
-    }
-};
-
-exports.deleteItem = async (req, res) => {
-    try {
-        const deleted = await LostNFound.findByIdAndDelete(req.params.id);
-        if (!deleted) return res.status(404).json({ message: "Item not found" });
-        res.status(200).json({ message: "Item deleted" });
-    } catch (error) {
-        res.status(500).json({ message: "Error deleting item", error });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };

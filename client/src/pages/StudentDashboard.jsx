@@ -14,6 +14,7 @@ import ResearchForm from "@/components/ResearchForm";
 import API from "@/services/api";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/toast";
+import { Search } from "lucide-react";
 
 export default function StudentDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -76,15 +77,15 @@ export default function StudentDashboard() {
     return (
         <div
             className={`flex min-h-screen transition-all duration-300 ${darkMode
-                    ? "bg-[#1c1a17] text-gray-200"
-                    : "bg-gradient-to-br from-[#e3f0ff] via-white to-[#fdfaf7] text-gray-900"
+                ? "bg-[#1c1a17] text-gray-200"
+                : "bg-gradient-to-br from-[#e3f0ff] via-white to-[#fdfaf7] text-gray-900"
                 }`}
         >
             {/* Sidebar */}
             <aside
                 className={`fixed top-0 left-0 h-screen shadow-xl p-4 flex flex-col justify-between transition-all duration-300 ${darkMode
-                        ? "bg-[#2c2a26]"
-                        : "bg-gradient-to-b from-[#2b4b6f] to-[#7b3f00] text-white"
+                    ? "bg-[#2c2a26]"
+                    : "bg-gradient-to-b from-[#2b4b6f] to-[#7b3f00] text-white"
                     }`}
                 style={{ width: sidebarOpen ? "230px" : "80px" }}
             >
@@ -106,6 +107,7 @@ export default function StudentDashboard() {
                     <nav className="space-y-3">
                         {[
                             { icon: <BookOpen />, label: "Research", path: "/resources" },
+                            { icon: <Search />, label: "Lost n' found", path: "/lostnfound" },
                             { icon: <Bell />, label: "Announcements", path: "/announcements" },
                             { icon: <MessageSquare />, label: "Tutors", path: "/tutors" },
                             { icon: <Settings />, label: "Settings", path: "/settings" },
@@ -114,8 +116,8 @@ export default function StudentDashboard() {
                                 key={i}
                                 to={item.path}
                                 className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${location.pathname === item.path
-                                        ? "bg-white/25 shadow-lg"
-                                        : "hover:bg-white/15"
+                                    ? "bg-white/25 shadow-lg"
+                                    : "hover:bg-white/15"
                                     }`}
                             >
                                 {item.icon}
@@ -229,8 +231,8 @@ export default function StudentDashboard() {
                                             </h4>
                                             <p
                                                 className={`mt-1 ${darkMode
-                                                        ? "text-gray-300"
-                                                        : "text-gray-600"
+                                                    ? "text-gray-300"
+                                                    : "text-gray-600"
                                                     }`}
                                             >
                                                 {announcement.message}
@@ -238,8 +240,8 @@ export default function StudentDashboard() {
                                             {announcement.date && (
                                                 <p
                                                     className={`text-xs mt-2 ${darkMode
-                                                            ? "text-gray-400"
-                                                            : "text-gray-500"
+                                                        ? "text-gray-400"
+                                                        : "text-gray-500"
                                                         }`}
                                                 >
                                                     {new Date(

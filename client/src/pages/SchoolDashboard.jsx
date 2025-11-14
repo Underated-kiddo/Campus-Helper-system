@@ -3,6 +3,8 @@ import { Bell, Settings, Menu, LogOut, User, Users } from "lucide-react";
 import API from "@/services/api";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/toast";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import { Search } from "lucide-react";
 
 export default function SchoolDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -92,6 +94,7 @@ export default function SchoolDashboard() {
                     <nav className="space-y-3">
                         {[
                             { icon: <Bell />, label: "Announcements", path: "/announcements" },
+                            {icon: <Search/>, label:"Lost n' found", path:"/lostnfound"},
                             { icon: <Settings />, label: "Settings", path: "/settings" },
                         ].map((item, i) => (
                             <Link
