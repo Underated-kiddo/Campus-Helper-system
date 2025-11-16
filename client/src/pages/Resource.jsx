@@ -10,7 +10,7 @@ export default function Research() {
     useEffect(() => {
         const fetchMaterials = async () => {
             try {
-                const res = await API.get("/resources"); // same endpoint
+                const res = await API.get("/resources");
                 setMaterials(res.data);
             } catch (err) {
                 console.error("Error fetching materials:", err);
@@ -84,7 +84,6 @@ export default function Research() {
                                     className={`relative w-full h-full transition-transform duration-700 transform-style-preserve-3d ${flipped === mat._id ? "rotate-y-180" : ""
                                         }`}
                                 >
-                                    {/* FRONT */}
                                     <div className="absolute inset-0 flex flex-col justify-center items-center rounded-2xl bg-gradient-to-br from-blue-100 to-[#f2e4d0] border border-blue-200 shadow-lg hover:shadow-2xl p-4">
                                         <FileText size={38} className="text-blue-700 mb-3" />
                                         <h3 className="text-lg font-semibold text-[#5a3c25]">
@@ -93,7 +92,6 @@ export default function Research() {
                                         <p className="text-sm text-gray-600">{mat.name}</p>
                                     </div>
 
-                                    {/* BACK */}
                                     <div className="absolute inset-0 rotate-y-180 flex flex-col justify-center items-center rounded-2xl bg-gradient-to-br from-[#d7bfa0] via-white to-blue-100 border shadow-lg p-4 text-center">
                                         <p className="text-sm text-gray-700">
                                             <strong className="text-blue-700">Author:</strong>{" "}

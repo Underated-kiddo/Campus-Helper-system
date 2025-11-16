@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-export default function TutorForm() {
+export default function LostnfoundForm() {
     const [formData, setFormData] = useState({
         name: "",
         phone_number: "",
@@ -12,6 +12,7 @@ export default function TutorForm() {
         item_description: "",
         uploaded_image: null,
     });
+
     const [preview, setPreview] = useState(null);
 
     const handleChange = (e) => {
@@ -31,26 +32,19 @@ export default function TutorForm() {
         e.preventDefault();
         try {
             const data = new FormData();
-            for (const key in formData) {
-                data.append(key, formData[key]);
-            }
+            data.append("name", formData.name);
+            data.append("phone_number", formData.phone_number);
+            data.append("item_found", formData.item_found);
+            data.append("item_description", formData.item_description);
+            if (formData.uploaded_image) data.append("uploaded_image", formData.uploaded_image);
 
-            await API.post("/lostnfound", data, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
+            await API.post("/lostnfound", data, { headers: { "Content-Type": "multipart/form-data" } });
 
             alert("Submitted successfully!");
-            setFormData({
-                name: "",
-                phone_number: "",
-                item_found: "",
-                item_description: "",
-                uploaded_image: null,
-            });
+            setFormData({ name: "", phone_number: "", item_found: "", item_description: "", uploaded_image: null });
             setPreview(null);
         } catch (err) {
-            console.error("Failed to submit item data:", err);
-            console.log(err.response?.data); 
+            console.error(err);
             alert("Error submitting form");
         }
     };
@@ -65,100 +59,42 @@ export default function TutorForm() {
                     Lost & Found Item Form
                 </h2>
 
-                <div className="mb-4">
-                    <label className="block text-sm font-semibold text-blue-800 mb-1">
-                        Full Name
-                    </label>
-                    <Input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="Enter your full name"
-                        required
-                        className="border-blue-200 focus:border-blue-500"
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-sm font-semibold text-blue-800 mb-1">
-                        Phone Number
-                    </label>
-                    <Input
-                        type="text"
-                        name="phone_number"
-                        value={formData.phone_number}
-                        onChange={handleChange}
-                        placeholder="Enter your contact number"
-                        required
-                        className="border-blue-200 focus:border-blue-500"
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-sm font-semibold text-blue-800 mb-1">
-                        Item Found
-                    </label>
-                    <Input
-                        type="text"
-                        name="item_found"
-                        value={formData.item_found}
-                        onChange={handleChange}
-                        placeholder="What item did you find?"
-                        required
-                        className="border-blue-200 focus:border-blue-500"
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-sm font-semibold text-blue-800 mb-1">
-                        Item Description
-                    </label>
-                    <Textarea
-                        name="item_description"
-                        value={formData.item_description}
-                        onChange={handleChange}
-                        placeholder="Describe the item briefly"
-                        required
-                        className="border-blue-200 focus:border-blue-500 min-h-[100px]"
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-sm font-semibold text-blue-800 mb-1">
-                        Upload Image (optional)
-                    </label>
-                    <div className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-4 bg-blue-50 hover:bg-blue-100 transition cursor-pointer">
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                            id="file-upload"
-                            name="uploaded_image"
-                        />
-                        <label
-                            htmlFor="file-upload"
-                            className="text-blue-700 font-medium cursor-pointer hover:underline"
-                        >
-                            Click to upload image
-                        </label>
-                        {preview && (
-                            <img
-                                src={preview}
-                                alt="Preview"
-                                className="mt-4 w-40 h-40 object-cover rounded-xl shadow-md border border-blue-100"
-                            />
-                        )}
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-semibold text-blue-800 mb-1">Full Name</label>
+                        <Input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Enter your full name" required />
                     </div>
-                </div>
 
-                <Button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-blue-700 to-amber-600 hover:opacity-90 text-white font-semibold py-2 rounded-xl transition-all duration-200"
-                >
-                    Submit
-                </Button>
+                    <div>
+                        <label className="block text-sm font-semibold text-blue-800 mb-1">Phone Number</label>
+                        <Input type="text" name="phone_number" value={formData.phone_number} onChange={handleChange} placeholder="Enter your contact number" required />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-blue-800 mb-1">Item Found</label>
+                        <Input type="text" name="item_found" value={formData.item_found} onChange={handleChange} placeholder="What item did you find?" required />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-blue-800 mb-1">Item Description</label>
+                        <Textarea name="item_description" value={formData.item_description} onChange={handleChange} placeholder="Describe the item briefly" required />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-blue-800 mb-1">Upload Image (optional)</label>
+                        <div className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-4 bg-blue-50 hover:bg-blue-100 cursor-pointer">
+                            <input type="file" accept="image/*" name="uploaded_image" id="lost-file-upload" className="hidden" onChange={handleImageChange} />
+                            <label htmlFor="lost-file-upload" className="text-blue-700 font-medium cursor-pointer hover:underline">
+                                Click to upload image
+                            </label>
+                            {preview && <img src={preview} alt="Preview" className="mt-4 w-40 h-40 object-cover rounded-xl shadow-md border border-blue-100" />}
+                        </div>
+                    </div>
+
+                    <Button type="submit" className="w-full bg-gradient-to-r from-blue-700 to-amber-600 hover:opacity-90 text-white font-semibold py-2 rounded-xl">
+                        Submit
+                    </Button>
+                </div>
             </form>
         </div>
     );

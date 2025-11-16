@@ -3,8 +3,9 @@ import API from "../services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { FileText, File, Clipboard, Archive, Paperclip } from "lucide-react";
 
-export default function ResearchForm() {
+export default function ResourceForm() {
     const [formData, setFormData] = useState({
         name: "",
         unit: "",
@@ -15,50 +16,22 @@ export default function ResearchForm() {
 
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
-        // Only allow PDF, Word, PPT, ZIP, RAR
-        const allowedTypes = [
-            "application/pdf",
-            "application/msword",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/vnd.ms-powerpoint",
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            "application/zip",
-            "application/x-rar-compressed"
-        ];
-
-        if (!allowedTypes.includes(file.type)) {
-            alert("Unsupported file type. Only PDF, Word, PPT, ZIP, RAR allowed.");
-            e.target.value = null;
-            return;
-        }
-
-        if (file.size > 30 * 1024 * 1024) {
-            alert("File is too big! Max size is 30MB.");
-            e.target.value = null;
-            return;
-        }
-
         setFormData({ ...formData, file });
     };
 
     const handleRemoveFile = () => {
         setFormData({ ...formData, file: null });
-        document.getElementById("file-upload").value = null;
+        document.getElementById("resource-file-upload").value = null;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!formData.file) return alert("Please select a file before submitting!");
-
         setLoading(true);
 
         try {
@@ -74,22 +47,24 @@ export default function ResearchForm() {
             });
 
             alert("Research material submitted successfully!");
-
-            setFormData({
-                name: "",
-                unit: "",
-                description: "",
-                author: "",
-                file: null,
-            });
-
-            document.getElementById("file-upload").value = null;
+            setFormData({ name: "", unit: "", description: "", author: "", file: null });
+            document.getElementById("resource-file-upload").value = null;
         } catch (err) {
-            console.error("Failed to submit material:", err);
+            console.error(err);
             alert(err.response?.data?.message || "Error submitting research material");
         } finally {
             setLoading(false);
         }
+    };
+
+    const getFileIcon = (file) => {
+        if (!file) return <Paperclip className="text-6xl text-blue-400" />;
+        const type = file.type.toLowerCase();
+        if (type.includes("pdf")) return <FileText className="text-6xl text-red-500" />;
+        if (type.includes("word") || type.includes("msword") || type.includes("officedocument")) return <File className="text-6xl text-blue-600" />;
+        if (type.includes("presentation") || type.includes("powerpoint")) return <Clipboard className="text-6xl text-yellow-500" />;
+        if (type.includes("zip") || type.includes("rar")) return <Archive className="text-6xl text-gray-500" />;
+        return <Paperclip className="text-6xl text-blue-400" />;
     };
 
     return (
@@ -99,7 +74,7 @@ export default function ResearchForm() {
                 className="w-full max-w-lg bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-blue-100 p-8 hover:shadow-2xl transition-all duration-300"
             >
                 <h2 className="text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-amber-600">
-                    Upload Research Material📚
+                    Upload Research Material 📚
                 </h2>
 
                 <div className="space-y-4">
@@ -112,7 +87,6 @@ export default function ResearchForm() {
                             onChange={handleChange}
                             placeholder="Enter the topic name"
                             required
-                            className="border-blue-200 focus:border-blue-500"
                         />
                     </div>
 
@@ -125,7 +99,6 @@ export default function ResearchForm() {
                             onChange={handleChange}
                             placeholder="Enter the unit name"
                             required
-                            className="border-blue-200 focus:border-blue-500"
                         />
                     </div>
 
@@ -137,7 +110,6 @@ export default function ResearchForm() {
                             onChange={handleChange}
                             placeholder="Briefly describe the material"
                             required
-                            className="border-blue-200 focus:border-blue-500 min-h-[100px]"
                         />
                     </div>
 
@@ -150,54 +122,39 @@ export default function ResearchForm() {
                             onChange={handleChange}
                             placeholder="Your name"
                             required
-                            className="border-blue-200 focus:border-blue-500"
                         />
                     </div>
 
                     <div>
                         <label className="block text-sm font-semibold text-blue-800 mb-1">Upload File</label>
                         <div
-                            onClick={() => document.getElementById("file-upload").click()}
-                            className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-6 bg-blue-50 hover:bg-blue-100 cursor-pointer"
+                            onClick={() => document.getElementById("resource-file-upload").click()}
+                            className="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-6 bg-blue-50 hover:bg-blue-100 cursor-pointer min-h-[140px]"
                         >
                             <input
                                 type="file"
                                 name="file"
-                                accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.rar"
+                                accept="*"
                                 onChange={handleFileChange}
                                 className="hidden"
-                                id="file-upload"
+                                id="resource-file-upload"
                             />
-                            <p className="text-blue-700 font-medium hover:underline">
-                                {formData.file
-                                    ? formData.file.name
-                                    : "Click here to select a file (PDF, Word, PPT, ZIP/RAR)"}
-                            </p>
-
+                            <div className="mb-2">{getFileIcon(formData.file)}</div>
+                            <p className="text-blue-700 font-medium">{formData.file ? formData.file.name : "Click here to select a file"}</p>
                             {formData.file && (
-                                <div className="text-sm text-blue-600 mt-1 text-center">
-                                    Size: {(formData.file.size / 1024 / 1024).toFixed(2)} MB<br />
-                                    Type: {formData.file.type || "Unknown"}
-                                </div>
+                                <p className="text-blue-600 text-sm mt-1 text-center">
+                                    {(formData.file.size / 1024 / 1024).toFixed(2)} MB • {formData.file.type || "Unknown type"}
+                                </p>
                             )}
                         </div>
-
                         {formData.file && (
-                            <button
-                                type="button"
-                                onClick={handleRemoveFile}
-                                className="mt-2 text-red-600 hover:underline text-sm"
-                            >
+                            <button type="button" onClick={handleRemoveFile} className="mt-2 text-red-600 hover:underline text-sm">
                                 Remove file
                             </button>
                         )}
                     </div>
 
-                    <Button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full mt-6 bg-gradient-to-r from-blue-700 to-amber-600 hover:opacity-90 text-white font-semibold py-2 rounded-xl transition-all duration-200 disabled:opacity-50"
-                    >
+                    <Button type="submit" disabled={loading} className="w-full mt-6 bg-gradient-to-r from-blue-700 to-amber-600 hover:opacity-90 text-white font-semibold py-2 rounded-xl">
                         {loading ? "Uploading..." : "Submit"}
                     </Button>
                 </div>

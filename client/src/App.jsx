@@ -8,7 +8,7 @@ import SchoolDashboard from "./pages/SchoolDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import Settings from "@/pages/Settings";
-import ResearchMaterials from "./pages/Research";
+import ResearchMaterials from "./pages/Resource";
 import Announcements from "./pages/Announcements";
 import Lostnfound from "./pages/Lostnfound";
 import Tutors from "./pages/Tutors";
@@ -62,7 +62,6 @@ export default function App() {
         </Routes>
       </BrowserRouter>
 
-      {/* ✅ Toast renderer (must be outside Router) */}
       <Toaster richColors position="top-center" closeButton />
     </>
   );

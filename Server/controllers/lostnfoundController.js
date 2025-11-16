@@ -1,13 +1,11 @@
 const Lostnfound = require("../models/Lostnfound");
 
-// Add new lost item
 exports.addLostItem = async (req, res) => {
     try {
         const { name, item_found, item_description, phone_number } = req.body;
-        const upload_image = req.file ? req.file.path : null;
 
-        if (!name || !item_found || !item_description || !phone_number ) {
-            return res.status(400).json({ message: "All necessary fields  are required" });
+        if (!name || !item_found || !item_description || !phone_number) {
+            return res.status(400).json({ message: "All fields are required" });
         }
 
         const newItem = new Lostnfound({
@@ -17,17 +15,25 @@ exports.addLostItem = async (req, res) => {
             },
             item_found,
             item_description,
-            upload_image,
+            uploaded_image: req.file
+                ? {
+                    data: req.file.buffer,
+                    contentType: req.file.mimetype,
+                }
+                : null,
         });
 
         await newItem.save();
-        res.status(201).json({ message: "Lost item Posted successfully", data: newItem });
+
+        res.status(201).json({
+            message: "Lost item posted",
+            data: newItem,
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
-// Get all lost items
 exports.getLostItems = async (req, res) => {
     try {
         const items = await Lostnfound.find().sort({ createdAt: -1 });

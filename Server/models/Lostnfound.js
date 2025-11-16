@@ -24,10 +24,12 @@ const lostnfoundSchema = new mongoose.Schema(
             required: [true, "Item description is required"],
             trim: true,
         },
-        upload_image: {
-            type: String, // Path or URL to image
-            default: null,
-                },
+
+        uploaded_image: {
+            data: Buffer,
+            contentType: String,
+            // default: false,
+        },
     },
     { timestamps: true }
 );

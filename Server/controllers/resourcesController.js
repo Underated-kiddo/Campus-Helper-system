@@ -1,54 +1,56 @@
-const Resource = require("../models/resources");
-const path = require("path");
-const fs = require("fs");
+const mongoose = require("mongoose");
+const Resource = require("../models/Resource");
+const { getResourceBucket } = require("../config/gridfs");
 
-// UPLOAD RESOURCE
 exports.uploadResource = async (req, res) => {
     try {
+        if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
         const { name, unit, description, author } = req.body;
 
-        if (!req.file) {
-            return res.status(400).json({ message: "No file uploaded." });
-        }
-
-        // Extract file details
-        const fileUrl = `/uploads/resources/${req.file.filename}`;
-        const fileName = req.file.originalname;
-        const fileType = req.file.mimetype;
-        const fileSize = req.file.size;
-
-        // Create new resource entry
-        const newResource = await Resource.create({
+        const resource = new Resource({
             name,
             unit,
             description,
             author,
-            fileUrl,
-            fileName,
-            fileType,
-            fileSize,
+            fileId: req.file.id,
+            filename: req.file.filename,
+            contentType: req.file.contentType,
         });
 
-        res.status(201).json({
-            message: "Resource uploaded successfully",
-            resource: newResource,
-        });
-    } catch (error) {
-        console.error("Upload Error:", error);
-        res.status(500).json({ message: "Upload failed", error: error.message });
+        await resource.save();
+        res.status(201).json({ message: "Resource uploaded", resource });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to upload resource" });
     }
 };
 
-// GET ALL RESOURCES
 exports.getResources = async (req, res) => {
     try {
         const resources = await Resource.find().sort({ createdAt: -1 });
         res.json(resources);
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        res.status(500).json({
-            message: "Failed to fetch resources",
-            error: error.message,
-        });
+    } catch (err) {
+        res.status(500).json({ message: "Failed to fetch resources" });
+    }
+};
+
+exports.downloadResource = async (req, res) => {
+    try {
+        const bucket = getResourceBucket();
+        if (!bucket) return res.status(500).json({ message: "GridFS not ready" });
+
+        const fileId = new mongoose.Types.ObjectId(req.params.id);
+
+        const files = await bucket.find({ _id: fileId }).toArray();
+        if (!files || files.length === 0) return res.status(404).json({ message: "File not found" });
+
+        res.set("Content-Type", files[0].contentType);
+        res.set("Content-Disposition", `attachment; filename="${files[0].filename}"`);
+
+        bucket.openDownloadStream(fileId).pipe(res);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to download resource" });
     }
 };

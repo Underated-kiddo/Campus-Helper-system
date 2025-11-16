@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import TutorForm from "@/components/TutorForm";
 import FoundForm from "@/components/FoundForm";
-import ResearchForm from "@/components/ResearchForm";
+import ResourceForm from "@/components/ResourceForm";
 import API from "@/services/api";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/toast";
@@ -259,7 +259,7 @@ export default function StudentDashboard() {
 
                 <TutorForm />
                 <FoundForm />
-                <ResearchForm />
+                <ResourceForm />
             </main>
         </div>
     );
