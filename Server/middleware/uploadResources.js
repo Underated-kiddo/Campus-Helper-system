@@ -1,27 +1,22 @@
+// middleware/uploadResources.js
 const multer = require("multer");
-const { GridFsStorage } = require("multer-gridfs-storage");
-const crypto = require("crypto");
 const path = require("path");
+const fs = require("fs");
 
-const mongoURI = process.env.MONGO_URI;
+const uploadFolder = path.join(__dirname, "../uploads/resources");
 
-const storage = new GridFsStorage({
-    url: mongoURI,
-    file: (req, file) =>
-        new Promise((resolve, reject) => {
-            crypto.randomBytes(16, (err, buf) => {
-                if (err) return reject(err);
+// Ensure folder exists
+if (!fs.existsSync(uploadFolder)) {
+    fs.mkdirSync(uploadFolder, { recursive: true });
+}
 
-                const filename = buf.toString("hex") + path.extname(file.originalname);
-                const fileInfo = {
-                    filename,
-                    bucketName: "researchFiles", // Dedicated bucket
-                };
-                resolve(fileInfo);
-            });
-        }),
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadFolder),
+    filename: (req, file, cb) => {
+        // prepend timestamp to prevent collisions
+        const uniqueName = Date.now() + "-" + file.originalname;
+        cb(null, uniqueName);
+    },
 });
 
-const upload = multer({ storage });
-
-module.exports = upload;
+module.exports = multer({ storage });

@@ -1,67 +1,60 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 const mongoose = require("mongoose");
-
-// Database & GridFS
-const connectDB = require("./config/db");
-const { initResourceBucket } = require("./config/gridfs");
+const path = require("path");
 
 const app = express();
 
-// Connect to MongoDB + initialize GridFS for resources
-connectDB().then(() => {
-	console.log("MongoDB connected");
-	initResourceBucket(); // GridFS bucket ready for resources
-});
-
-// CORS
-app.use(
-	cors({
-		origin: process.env.CLIENT_URL || "http://localhost:5173",
-		credentials: true,
-		allowedHeaders: ["Content-Type", "Authorization"],
-	})
-);
-
-// JSON parser
+// Middleware
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// -------------------- ROUTES --------------------
+// Serve static uploads folder
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads/resources", express.static(path.join(__dirname, "uploads/resources")));
 
-// Authentication
-app.use("/api/auth", require("./routes/authRoutes"));
+// ============================
+//       IMPORT ROUTES
+// ============================
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const studentRoutes = require("./routes/studentRoutes");
+const tutorRoutes = require("./routes/tutorRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const announcementRoutes = require("./routes/announcementRoutes");
+const schoolRoutes = require("./routes/schoolRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
+const resourceRoutes = require("./routes/resourceRoutes");
+const lostnfoundRoutes = require("./routes/lostnfoundRoutes");
 
-// Lost & Found (disk uploads)
-app.use("/api/lostnfound", require("./routes/lostnfoundRoutes"));
+// ============================
+//       USE ROUTES
+// ============================
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/student", studentRoutes);
+app.use("/api/tutors", tutorRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/announcements", announcementRoutes);
+app.use("/api/school", schoolRoutes);
+app.use("/api/settings", settingsRoutes);
+app.use("/api/resources", resourceRoutes);
+app.use("/api/lostnfound", lostnfoundRoutes);
 
-// Resources (GridFS uploads)
-app.use("/api/resources", require("./routes/resourceRoutes"));
+// ============================
+//       MONGO CONNECTION
+// ============================
+mongoose.connect(process.env.MONGO_URI, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+})
+	.then(() => console.log("MongoDB connected"))
+	.catch((err) => console.error("MongoDB connection error:", err));
 
-// Other modules
-app.use("/api/tutors", require("./routes/tutorRoutes"));
-app.use("/api/settings", require("./routes/settingsRoutes"));
-app.use("/api/announcements", require("./routes/announcementRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes"));
-app.use("/api/school", require("./routes/schoolRoutes"));
-app.use("/api/student", require("./routes/studentRoutes"));
-
-// -------------------- STATIC FILES --------------------
-
-// Lost & Found local images
-app.use(
-	"/uploads/lostnfound",
-	express.static(path.join(__dirname, "uploads/lostnfound"))
-);
-
-// -------------------- ERROR HANDLING --------------------
-app.use((req, res) => {
-	res.status(404).json({ message: "Route not found" });
-});
-
-// -------------------- START SERVER --------------------
+// ============================
+//       START SERVER
+// ============================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
-	console.log(`Server is running on http://localhost:${PORT}`)
-);
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

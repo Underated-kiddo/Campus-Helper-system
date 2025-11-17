@@ -15,6 +15,7 @@ export default function ResourceForm() {
     });
 
     const [loading, setLoading] = useState(false);
+    const [uploadedResources, setUploadedResources] = useState([]); // NEW: store uploaded resources
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -42,11 +43,14 @@ export default function ResourceForm() {
             data.append("author", formData.author);
             data.append("file", formData.file);
 
-            await API.post("/resources/upload", data, {
+            const res = await API.post("/resources/upload", data, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
             alert("Research material submitted successfully!");
+            const uploaded = res.data.resource;
+            setUploadedResources([uploaded, ...uploadedResources]); // add to list
+
             setFormData({ name: "", unit: "", description: "", author: "", file: null });
             document.getElementById("resource-file-upload").value = null;
         } catch (err) {
@@ -61,17 +65,19 @@ export default function ResourceForm() {
         if (!file) return <Paperclip className="text-6xl text-blue-400" />;
         const type = file.type.toLowerCase();
         if (type.includes("pdf")) return <FileText className="text-6xl text-red-500" />;
-        if (type.includes("word") || type.includes("msword") || type.includes("officedocument")) return <File className="text-6xl text-blue-600" />;
-        if (type.includes("presentation") || type.includes("powerpoint")) return <Clipboard className="text-6xl text-yellow-500" />;
+        if (type.includes("word") || type.includes("msword") || type.includes("officedocument"))
+            return <File className="text-6xl text-blue-600" />;
+        if (type.includes("presentation") || type.includes("powerpoint"))
+            return <Clipboard className="text-6xl text-yellow-500" />;
         if (type.includes("zip") || type.includes("rar")) return <Archive className="text-6xl text-gray-500" />;
         return <Paperclip className="text-6xl text-blue-400" />;
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-white to-amber-100 p-6">
+        <div className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-blue-100 via-white to-amber-100 p-6">
             <form
                 onSubmit={handleSubmit}
-                className="w-full max-w-lg bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-blue-100 p-8 hover:shadow-2xl transition-all duration-300"
+                className="w-full max-w-lg bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-blue-100 p-8 hover:shadow-2xl transition-all duration-300 mb-6"
             >
                 <h2 className="text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-amber-600">
                     Upload Research Material 📚
@@ -154,11 +160,34 @@ export default function ResourceForm() {
                         )}
                     </div>
 
-                    <Button type="submit" disabled={loading} className="w-full mt-6 bg-gradient-to-r from-blue-700 to-amber-600 hover:opacity-90 text-white font-semibold py-2 rounded-xl">
+                    <Button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full mt-6 bg-gradient-to-r from-blue-700 to-amber-600 hover:opacity-90 text-white font-semibold py-2 rounded-xl"
+                    >
                         {loading ? "Uploading..." : "Submit"}
                     </Button>
                 </div>
             </form>
+
+            {/* NEW: List of uploaded resources with download links */}
+            {uploadedResources.length > 0 && (
+                <div className="w-full max-w-lg space-y-4">
+                    <h3 className="text-2xl font-bold text-blue-700 mb-2">Uploaded Resources</h3>
+                    {uploadedResources.map((res) => (
+                        <div key={res._id} className="flex items-center justify-between border p-3 rounded-xl bg-white shadow-sm">
+                            <span>{res.name}</span>
+                            <a
+                                href={`http://localhost:5000/${res.filePath}`}
+                                download={res.filename}
+                                className="text-blue-600 hover:underline"
+                            >
+                                Download
+                            </a>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

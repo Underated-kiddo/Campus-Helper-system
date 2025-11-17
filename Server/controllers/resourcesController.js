@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+// controllers/resourcesController.js
 const Resource = require("../models/Resource");
-const { getResourceBucket } = require("../config/gridfs");
+const path = require("path");
 
 exports.uploadResource = async (req, res) => {
     try {
@@ -10,12 +10,11 @@ exports.uploadResource = async (req, res) => {
 
         const resource = new Resource({
             name,
-            unit,
-            description,
-            author,
-            fileId: req.file.id,
-            filename: req.file.filename,
-            contentType: req.file.contentType,
+            unit: unit || "",
+            description: description || "",
+            author: author || "",
+            filePath: `uploads/resources/${req.file.filename}`,
+            filename: req.file.originalname,
         });
 
         await resource.save();
@@ -31,24 +30,18 @@ exports.getResources = async (req, res) => {
         const resources = await Resource.find().sort({ createdAt: -1 });
         res.json(resources);
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: "Failed to fetch resources" });
     }
 };
 
+// Optional: keep a download endpoint if you want auth protection
 exports.downloadResource = async (req, res) => {
     try {
-        const bucket = getResourceBucket();
-        if (!bucket) return res.status(500).json({ message: "GridFS not ready" });
+        const resource = await Resource.findById(req.params.id);
+        if (!resource) return res.status(404).json({ message: "File not found" });
 
-        const fileId = new mongoose.Types.ObjectId(req.params.id);
-
-        const files = await bucket.find({ _id: fileId }).toArray();
-        if (!files || files.length === 0) return res.status(404).json({ message: "File not found" });
-
-        res.set("Content-Type", files[0].contentType);
-        res.set("Content-Disposition", `attachment; filename="${files[0].filename}"`);
-
-        bucket.openDownloadStream(fileId).pipe(res);
+        res.download(path.join(__dirname, "../", resource.filePath), resource.filename);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Failed to download resource" });

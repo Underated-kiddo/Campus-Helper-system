@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import API from "../services/api";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 export default function Lostnfound() {
     const [items, setItems] = useState([]);
+    const cardRefs = useRef([]);
 
     useEffect(() => {
         const fetchLostItems = async () => {
@@ -18,6 +19,26 @@ export default function Lostnfound() {
         fetchLostItems();
     }, []);
 
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("translate-y-0", "opacity-100");
+                        entry.target.classList.remove("translate-y-10", "opacity-0");
+                    }
+                });
+            },
+            { threshold: 0.3 }
+        );
+
+        cardRefs.current.forEach((ref) => {
+            if (ref) observer.observe(ref);
+        });
+
+        return () => observer.disconnect();
+    }, [items]);
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-sky-200 via-amber-100 to-stone-300 dark:from-zinc-900 dark:via-zinc-950 dark:to-black p-8 flex flex-col items-center transition-all duration-500">
             <h1 className="text-4xl font-extrabold text-zinc-900 dark:text-white mb-10 text-center drop-shadow-lg">
@@ -30,10 +51,13 @@ export default function Lostnfound() {
                 </p>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl">
-                    {items.map((item) => (
+                    {items.map((item, index) => (
                         <div
                             key={item._id}
-                            className="rounded-2xl overflow-hidden shadow-2xl backdrop-blur-lg border border-white/20 bg-gradient-to-br from-blue-100 via-amber-50 to-stone-200 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-700 transition-transform duration-300 hover:scale-[1.03] hover:shadow-amber-500/40"
+                            ref={(el) => (cardRefs.current[index] = el)}
+                            className="rounded-2xl overflow-hidden shadow-2xl backdrop-blur-lg border border-white/20 bg-gradient-to-br from-blue-100 via-amber-50 to-stone-200 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-700
+                                       transform transition-all duration-700 ease-out translate-y-10 opacity-0
+                                       hover:scale-[1.03] hover:shadow-amber-500/40 cursor-pointer"
                         >
                             <div className="w-full h-56 bg-gradient-to-tr from-sky-100 to-amber-200 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center">
                                 {item.uploaded_image ? (

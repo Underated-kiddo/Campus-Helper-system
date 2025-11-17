@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import API from "../services/api";
 import {
     Card,
@@ -9,10 +9,10 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-
 export default function Tutors() {
     const [tutors, setTutors] = useState([]);
     const [loading, setLoading] = useState(true);
+    const cardRefs = useRef([]);
 
     useEffect(() => {
         const fetchTutors = async () => {
@@ -28,6 +28,26 @@ export default function Tutors() {
 
         fetchTutors();
     }, []);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("translate-y-0", "opacity-100");
+                        entry.target.classList.remove("translate-y-10", "opacity-0");
+                    }
+                });
+            },
+            { threshold: 0.3 }
+        );
+
+        cardRefs.current.forEach((ref) => {
+            if (ref) observer.observe(ref);
+        });
+
+        return () => observer.disconnect();
+    }, [tutors]);
 
     const handleContact = (email) => {
         window.location.href = `mailto:${email}`;
@@ -54,10 +74,12 @@ export default function Tutors() {
                         No tutors found at the moment.
                     </p>
                 ) : (
-                    tutors.map((tutor) => (
+                    tutors.map((tutor, index) => (
                         <Card
                             key={tutor._id}
-                            className="w-full max-w-sm bg-white/80 backdrop-blur-lg border border-blue-100 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden"
+                            ref={(el) => (cardRefs.current[index] = el)}
+                            className="w-full max-w-sm bg-white/80 backdrop-blur-lg border border-blue-100 shadow-md hover:shadow-2xl hover:-translate-y-1
+                                       transform transition-all duration-700 ease-out translate-y-10 opacity-0 rounded-2xl overflow-hidden"
                         >
                             <CardHeader className="bg-gradient-to-r from-blue-700 to-amber-600 p-5">
                                 <CardTitle className="text-white text-xl font-semibold tracking-wide">
