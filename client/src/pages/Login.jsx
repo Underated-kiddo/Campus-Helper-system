@@ -57,7 +57,7 @@ export default function Login() {
         } catch (err) {
             console.error("Login error:", err);
 
-            // 🧠 Determine the likely cause
+            // Determine the likely cause
             let message = "Login failed due to an unexpected issue.";
             if (err.response) {
                 const { status, data } = err.response;
@@ -83,7 +83,7 @@ export default function Login() {
                 message = err.message || "Something went wrong.";
             }
 
-            // 🔥 Display detailed error toast
+            // Display detailed error toast
             toast.error(message);
         } finally {
             setLoading(false);

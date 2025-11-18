@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 
-const BASE_URL = import.meta.env.VITE_API_URL; // ✅ Load from .env
+const BASE_URL = import.meta.env.VITE_API_URL; 
 
 export default function Announcements() {
     const [announcements, setAnnouncements] = useState([]);
@@ -24,7 +24,7 @@ export default function Announcements() {
     useEffect(() => {
         const fetchAnnouncements = async () => {
             try {
-                const res = await API.get(`${BASE_URL}/announcements`); // ✅ use env var
+                const res = await API.get(`${BASE_URL}/announcements`); 
                 setAnnouncements(res.data);
             } catch (error) {
                 console.error("Error fetching announcements:", error);
@@ -42,7 +42,7 @@ export default function Announcements() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await API.post(`${BASE_URL}/announcements`, newAnnouncement); // ✅ use env var
+            const res = await API.post(`${BASE_URL}/announcements`, newAnnouncement); 
             toast.success("Announcement posted successfully!");
             setAnnouncements([res.data, ...announcements]);
             setNewAnnouncement({ title: "", message: "" });
@@ -55,7 +55,7 @@ export default function Announcements() {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this announcement?")) return;
         try {
-            await API.delete(`${BASE_URL}/announcements/${id}`); // ✅ use env var
+            await API.delete(`${BASE_URL}/announcements/${id}`); 
             setAnnouncements(announcements.filter((a) => a._id !== id));
             toast.success("Announcement deleted");
         } catch (err) {

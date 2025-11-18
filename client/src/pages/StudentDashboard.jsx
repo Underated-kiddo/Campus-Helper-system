@@ -142,7 +142,6 @@ export default function StudentDashboard() {
                 </div>
             </aside>
 
-            {/* Main Content */}
             <main
                 className={`flex-1 p-8 transition-all duration-300 ${sidebarOpen ? "ml-[230px]" : "ml-[80px]"
                     }`}
@@ -165,7 +164,6 @@ export default function StudentDashboard() {
                     </div>
                 ) : (
                     <>
-                        {/* Stats */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                             <div
                                 className={`p-6 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"
@@ -208,7 +206,6 @@ export default function StudentDashboard() {
                             </div>
                         </div>
 
-                        {/* Announcements */}
                         {announcements.length > 0 && (
                             <div
                                 className={`mb-8 rounded-xl shadow-lg ${darkMode ? "bg-[#2c2a26]" : "bg-white"

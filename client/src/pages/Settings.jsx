@@ -86,14 +86,12 @@ export default function Settings() {
         loadSettings();
     }, []);
 
-    // Persist bio locally whenever it changes
     useEffect(() => {
         if (settings.bio !== undefined) {
             localStorage.setItem("userBio", settings.bio);
         }
     }, [settings.bio]);
 
-    // Persist profile picture locally whenever it changes
     useEffect(() => {
         if (previewUrl) localStorage.setItem("profilePic", previewUrl);
     }, [previewUrl]);
@@ -111,8 +109,8 @@ export default function Settings() {
         if (file) {
             setProfilePic(file);
             const url = URL.createObjectURL(file);
-            setPreviewUrl(url); // instant preview
-            localStorage.setItem("profilePic", url); // persist locally
+            setPreviewUrl(url); 
+            localStorage.setItem("profilePic", url); 
         }
     };
 
@@ -427,7 +425,6 @@ export default function Settings() {
                     </CardContent>
                 </Card>
 
-                {/* Security */}
                 <Card
                     className={`border-t-4 ${isDark
                         ? "bg-[#2c2b29] border-[#3f3b38] border-t-[#d2b48c]"

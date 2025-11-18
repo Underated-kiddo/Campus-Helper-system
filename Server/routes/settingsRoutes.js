@@ -26,8 +26,6 @@ const storage = multer.diskStorage({
         cb(null, `${req.user._id}_${Date.now()}${ext}`);
     },
 });
-
-// File type filter (optional but good for security)
 const fileFilter = (req, file, cb) => {
     const allowed = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
     if (allowed.includes(file.mimetype)) cb(null, true);
@@ -35,23 +33,15 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({ storage, fileFilter });
-
-// ✅ Fetch user settings (GET /api/settings)
 router.get("/", protect, getSettings);
 
-// Update general user settings (name, bio, contact, etc.) - PUT /api/settings
+// Update general user settings 
 router.put("/", protect, updateSettings);
 
-// Upload or replace profile picture - POST /api/settings/profile/upload
+// Upload or replace profile picture 
 router.post("/profile/upload", protect, upload.single("profilePic"), uploadProfilePic);
-
-// Remove current profile picture - DELETE /api/settings/profile/remove
 router.delete("/profile/remove", protect, removeProfilePic);
-
-// Change user password - POST /api/settings/password/change
 router.post("/password/change", protect, changePassword);
-
-// Delete user account - DELETE /api/settings/account/delete
 router.delete("/account/delete", protect, deleteAccount);
 
 module.exports = router;

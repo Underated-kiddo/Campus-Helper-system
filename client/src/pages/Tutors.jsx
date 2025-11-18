@@ -79,7 +79,7 @@ export default function Tutors() {
                             key={tutor._id}
                             ref={(el) => (cardRefs.current[index] = el)}
                             className="w-full max-w-sm bg-white/80 backdrop-blur-lg border border-blue-100 shadow-md hover:shadow-2xl hover:-translate-y-1
-                                       transform transition-all duration-700 ease-out translate-y-10 opacity-0 rounded-2xl overflow-hidden"
+                                                    transform transition-all duration-700 ease-out translate-y-10 opacity-0 rounded-2xl overflow-hidden"
                         >
                             <CardHeader className="bg-gradient-to-r from-blue-700 to-amber-600 p-5">
                                 <CardTitle className="text-white text-xl font-semibold tracking-wide">

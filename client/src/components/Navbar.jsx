@@ -12,7 +12,6 @@ import { UserCircleIcon } from "@heroicons/react/24/solid";
 export default function Navbar() {
     const navigate = useNavigate();
 
-    // ✅ Proper Logout
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -20,7 +19,6 @@ export default function Navbar() {
         navigate("/login", { replace: true });
     };
 
-    // ✅ Navigate to settings
     const goToSettings = () => {
         navigate("/settings");
     };
@@ -32,7 +30,6 @@ export default function Navbar() {
                 sticky top-0 z-50 shadow-sm px-4 py-3 flex justify-between items-center 
                 transition-all duration-300"
         >
-            {/* Logo / Title */}
             <Link
                 to="/dashboard"
                 className="font-bold text-xl text-zinc-800 dark:text-zinc-100 hover:text-blue-600 transition-colors"
@@ -40,11 +37,9 @@ export default function Navbar() {
                 Helper Campus
             </Link>
 
-            {/* Right Side */}
             <div className="flex items-center gap-3">
                 <ThemeToggle />
 
-                {/* Profile Dropdown */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
@@ -61,7 +56,6 @@ export default function Navbar() {
                         className="w-44 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-lg 
                         border border-zinc-200 dark:border-zinc-700 rounded-lg"
                     >
-                        {/* ✅ Use `asChild` so clicks register correctly */}
                         <DropdownMenuItem asChild>
                             <button
                                 onClick={goToSettings}

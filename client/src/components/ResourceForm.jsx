@@ -15,7 +15,7 @@ export default function ResourceForm() {
     });
 
     const [loading, setLoading] = useState(false);
-    const [uploadedResources, setUploadedResources] = useState([]); // NEW: store uploaded resources
+    const [uploadedResources, setUploadedResources] = useState([]); 
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -49,7 +49,7 @@ export default function ResourceForm() {
 
             alert("Research material submitted successfully!");
             const uploaded = res.data.resource;
-            setUploadedResources([uploaded, ...uploadedResources]); // add to list
+            setUploadedResources([uploaded, ...uploadedResources]);
 
             setFormData({ name: "", unit: "", description: "", author: "", file: null });
             document.getElementById("resource-file-upload").value = null;
@@ -170,7 +170,6 @@ export default function ResourceForm() {
                 </div>
             </form>
 
-            {/* NEW: List of uploaded resources with download links */}
             {uploadedResources.length > 0 && (
                 <div className="w-full max-w-lg space-y-4">
                     <h3 className="text-2xl font-bold text-blue-700 mb-2">Uploaded Resources</h3>

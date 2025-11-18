@@ -56,8 +56,8 @@ export default function Lostnfound() {
                             key={item._id}
                             ref={(el) => (cardRefs.current[index] = el)}
                             className="rounded-2xl overflow-hidden shadow-2xl backdrop-blur-lg border border-white/20 bg-gradient-to-br from-blue-100 via-amber-50 to-stone-200 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-700
-                                       transform transition-all duration-700 ease-out translate-y-10 opacity-0
-                                       hover:scale-[1.03] hover:shadow-amber-500/40 cursor-pointer"
+                                                    transform transition-all duration-700 ease-out translate-y-10 opacity-0
+                                                    hover:scale-[1.03] hover:shadow-amber-500/40 cursor-pointer"
                         >
                             <div className="w-full h-56 bg-gradient-to-tr from-sky-100 to-amber-200 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center">
                                 {item.uploaded_image ? (

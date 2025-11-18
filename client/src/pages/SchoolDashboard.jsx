@@ -68,7 +68,6 @@ export default function SchoolDashboard() {
                 : "bg-gradient-to-br from-[#e3f0ff] via-white to-[#fdfaf7] text-gray-900"
                 }`}
         >
-            {/* Sidebar */}
             <aside
                 className={`fixed top-0 left-0 h-screen shadow-xl p-4 flex flex-col justify-between transition-all duration-300 ${darkMode
                     ? "bg-[#2c2a26]"
@@ -127,7 +126,6 @@ export default function SchoolDashboard() {
                 </div>
             </aside>
 
-            {/* Main content */}
             <main
                 className={`flex-1 p-8 transition-all duration-300 ${sidebarOpen ? "ml-[230px]" : "ml-[80px]"
                     }`}
@@ -140,7 +138,7 @@ export default function SchoolDashboard() {
                         onClick={() => setDarkMode(!darkMode)}
                         className="px-4 py-2 rounded-full bg-gradient-to-r from-[#2b4b6f] to-[#7b3f00] text-white hover:from-[#1f3a5b] hover:to-[#5c2e00] shadow-md transition"
                     >
-                        {darkMode ? "☀️ Light" : "🌙 Dark"}
+                        {darkMode ? "☀️ " : "🌙 "}
                     </button>
                 </div>
 
@@ -150,7 +148,6 @@ export default function SchoolDashboard() {
                     </div>
                 ) : (
                     <>
-                        {/* Stats cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             {[
                                 {
@@ -189,7 +186,6 @@ export default function SchoolDashboard() {
                             ))}
                         </div>
 
-                        {/* Announcements */}
                         {announcements.length > 0 && (
                             <div
                                 className={`mb-8 rounded-xl shadow-lg transform transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${darkMode ? "bg-[#2c2a26]" : "bg-white"

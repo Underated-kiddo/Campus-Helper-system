@@ -29,10 +29,10 @@ exports.signup = async (req, res) => {
             role: normalizedRole,
             name,
             contact,
-            profilePic: "",          // optional, can be added later in settings
-            bio: "",                 // optional
-            notifications: true,     // default enabled
-            privateMode: false,      // default false
+            profilePic: "",       
+            bio: "",                 
+            notifications: true,    
+            privateMode: false,      
         });
 
         // Generate JWT

@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const User = require("../models/User");
 
-// ✅ GET /api/settings - Fetch user settings
+// GET /api/settings - Fetch user settings
 exports.getSettings = async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select("-password");
@@ -15,7 +15,7 @@ exports.getSettings = async (req, res) => {
     }
 };
 
-// ✅ PUT /api/settings - Update user details
+// PUT /api/settings - Update user details
 exports.updateSettings = async (req, res) => {
     try {
         const allowedFields = [
@@ -46,7 +46,7 @@ exports.updateSettings = async (req, res) => {
     }
 };
 
-// ✅ POST /api/settings/profile/upload - Upload profile picture
+//  POST /api/settings/profile/upload - Upload profile picture
 exports.uploadProfilePic = async (req, res) => {
     try {
         if (!req.file)
@@ -72,7 +72,7 @@ exports.uploadProfilePic = async (req, res) => {
     }
 };
 
-// ✅ DELETE /api/settings/profile/remove - Remove profile picture
+//  DELETE /api/settings/profile/remove - Remove profile picture
 exports.removeProfilePic = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
@@ -92,7 +92,7 @@ exports.removeProfilePic = async (req, res) => {
     }
 };
 
-// ✅ POST /api/settings/password/change - Change password
+//  POST /api/settings/password/change - Change password
 exports.changePassword = async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body;
@@ -114,7 +114,7 @@ exports.changePassword = async (req, res) => {
     }
 };
 
-// ✅ DELETE /api/settings/account/delete - Delete user account
+// DELETE /api/settings/account/delete - Delete user account
 exports.deleteAccount = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);

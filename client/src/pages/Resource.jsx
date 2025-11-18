@@ -66,8 +66,8 @@ export default function Research() {
                                 key={mat._id}
                                 ref={(el) => (cardRefs.current[index] = el)}
                                 className="relative h-60 flex flex-col justify-center items-center rounded-2xl bg-gradient-to-br from-blue-100 to-[#f2e4d0] border border-blue-200 shadow-lg p-4
-                                           transform transition-all duration-700 ease-out translate-y-10 opacity-0
-                                           hover:-translate-y-3 hover:shadow-2xl cursor-pointer"
+                                                        transform transition-all duration-700 ease-out translate-y-10 opacity-0
+                                                        hover:-translate-y-3 hover:shadow-2xl cursor-pointer"
                             >
                                 <FileText size={38} className="text-blue-700 mb-3" />
                                 <h3 className="text-lg font-semibold text-[#5a3c25]">{mat.unit}</h3>

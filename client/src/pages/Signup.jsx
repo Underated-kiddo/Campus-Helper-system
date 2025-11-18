@@ -34,13 +34,13 @@ export default function Signup() {
 
             if (!user || !user.name) throw new Error("Signup failed — invalid response");
 
-            // ✅ Store user + token locally for dashboard use
+            // Store user + token locally for dashboard use
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(user));
 
             toast({ title: "Success!", description: `Welcome aboard, ${user.name}!` });
 
-            // ✅ Role-based redirect
+            // Role-based redirect
             const role = (user.role || "").toLowerCase();
             switch (role) {
                 case "admin":
